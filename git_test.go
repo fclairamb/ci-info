@@ -1,0 +1,25 @@
+package main
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
+
+func TestFetchGitInfoWithCmd(t *testing.T) {
+	a := require.New(t)
+	bi := &BuildInfo{}
+	a.Nil(fetchGitInfoWithCmd(bi))
+	a.NotEmpty(bi.CommitHash)
+	a.NotEmpty(bi.CommitBranch)
+
+	a.NotEmpty(bi.CommitDate)
+	a.Regexp("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} \\+[0-9]{4}", bi.CommitDate)
+
+	bi.complete()
+
+	a.NotEmpty(bi.CommitBranchClean)
+
+	a.NotEmpty(bi.CommitDateClean)
+	a.Regexp("[0-9]{14}", bi.CommitDateClean)
+}

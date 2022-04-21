@@ -1,0 +1,15 @@
+{
+  "version_input_file": {
+    "file": "VERSION",
+    "pattern": "VERSION = \"([0-9.]+)\"\n"
+  },
+  "version_input_tag": {
+    "pattern": "^v?([0-9.]+)$"
+  },
+  "template": {
+    "input_file": "build.go.tpl",
+    "output_file": "build.go"
+  },
+  "build_info_file": "build.json",
+  "disabled_git_cmd": true
+}

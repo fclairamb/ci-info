@@ -1,0 +1,10 @@
+[build]
+  bin = "ci-info"
+  cmd = "go build -o ci-info"
+  delay = 500
+  exclude_dir = ["testdata"]
+  exclude_regex = ["_test.go"]
+  include_ext = ["go", "tpl", "tmpl", "html", "json"]
+
+[screen]
+  clear_on_rebuild = true
