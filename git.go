@@ -22,12 +22,12 @@ func fetchGitInfoWithCmd(info *BuildInfo) error {
 
 		log.Debug("Fetching git info", "command", gifc.command)
 		cmd := exec.Command(gifc.command[0], gifc.command[1:]...)
-		if out, err := cmd.CombinedOutput(); err != nil {
+		if outBin, err := cmd.CombinedOutput(); err != nil {
 			return err
 		} else {
-			log.Debug("Fetched git info", "command", gifc.command, "output", string(out))
-			*gifc.info = string(out)
-			*gifc.info = strings.TrimRight(*gifc.info, "\n")
+			out := strings.TrimRight(string(outBin), "\n")
+			log.Debug("Fetched git info", "command", gifc.command, "output", out)
+			*gifc.info = out
 		}
 	}
 
