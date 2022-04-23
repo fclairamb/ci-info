@@ -20,7 +20,6 @@ jobs:
         run: |
           go build
           ./ci-info
-          echo "build.go" >> .gitignore
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
