@@ -1,2 +1,4 @@
 ci-info
+build.json
 tmp/
+.vscode/

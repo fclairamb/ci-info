@@ -16,10 +16,10 @@ func TestFetchGitInfoWithCmd(t *testing.T) {
 	a.NotEmpty(bi.CommitDate)
 	a.Regexp("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} \\+[0-9]{4}", bi.CommitDate)
 
-	bi.complete()
+	a.Nil(bi.complete())
 
 	a.NotEmpty(bi.CommitBranchClean)
 
 	a.NotEmpty(bi.CommitDateClean)
-	a.Regexp("[0-9]{14}", bi.CommitDateClean)
+	a.Regexp("[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{4}", bi.CommitDateClean)
 }

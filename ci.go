@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
+
+	log "github.com/inconshreveable/log15"
 )
 
 type CIInfoFetcher interface {
@@ -128,4 +131,27 @@ func (f JenkinsCIInfoFetcher) Fetch(bi *BuildInfo) error {
 
 func (f JenkinsCIInfoFetcher) String() string {
 	return "jenkins"
+}
+
+var fetchers = []CIInfoFetcher{
+	&CircleCIInfoFetcher{},
+	&GithubActionsCIInfoFetcher{},
+	&GitLabInfoFetcher{},
+	&DroneCIInfoFetcher{},
+	&TravisCIInfoFetcher{},
+	&JenkinsCIInfoFetcher{},
+}
+
+func fetchCIInfo(bi *BuildInfo) error {
+	for _, fetcher := range fetchers {
+		if !fetcher.Detect() {
+			continue
+		}
+		log.Info("Found CI info fetcher", "fetcher", fetcher.String())
+		if err := fetcher.Fetch(bi); err != nil {
+			return fmt.Errorf("Failed to fetch CI info: %w", err)
+		}
+		break
+	}
+	return nil
 }

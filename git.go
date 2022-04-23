@@ -2,6 +2,7 @@ package main
 
 import (
 	"os/exec"
+	"strings"
 
 	log "github.com/inconshreveable/log15"
 )
@@ -11,7 +12,7 @@ func fetchGitInfoWithCmd(info *BuildInfo) error {
 		{&info.CommitTag, []string{"git", "tag", "--points-at", "HEAD"}},
 		{&info.CommitHash, []string{"git", "rev-parse", "HEAD"}},
 		{&info.CommitBranch, []string{"git", "branch", "--show-current"}},
-		{&info.CommitDate, []string{"git", "show", "--quiet", "--format='%ci'"}},
+		{&info.CommitDate, []string{"git", "show", "--quiet", "--format=%ci"}},
 	}
 
 	for _, gifc := range gitCommands {
@@ -26,6 +27,7 @@ func fetchGitInfoWithCmd(info *BuildInfo) error {
 		} else {
 			log.Debug("Fetched git info", "command", gifc.command, "output", string(out))
 			*gifc.info = string(out)
+			*gifc.info = strings.TrimRight(*gifc.info, "\n")
 		}
 	}
 

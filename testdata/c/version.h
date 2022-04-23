@@ -4,10 +4,10 @@
 typedef struct {
     const char 
         *version, 
-        *commitHash, 
-        *commitDate, 
-        *commitTagOrBranch, 
-        *buildDate;
+        *commit_hash, 
+        *commit_date, 
+        *commit_smart, 
+        *build_date;
 } build_info_t;
 
 extern build_info_t build_info;

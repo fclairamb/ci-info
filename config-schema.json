@@ -1,0 +1,165 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/fclairamb/ci-info/main/config-schema.json",
+    "type": "object",
+    "title": "CI-Info config schema",
+    "description": "The config info",
+    "default": {},
+    "examples": [
+        {
+            "version_input_file": {
+                "file": "README.md",
+                "pattern": "Version: ([0-9.]+)\n"
+            },
+            "version_input_tag": {
+                "pattern": "^v?([0-9.]+)$"
+            },
+            "template": {
+                "input_file": "build.go.tpl",
+                "output_file": "build.go"
+            },
+            "build_info_file": "build.json",
+            "disable_git_cmd": false
+        }
+    ],
+    "required": [
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "title": "Schema",
+            "description": "The schema declaration",
+            "examples": [
+                "https://raw.githubusercontent.com/fclairamb/ci-info/main/config-schema.json"
+            ]
+        },
+        "version_input_file": {
+            "$id": "#/properties/version_input_file",
+            "type": "object",
+            "title": "The input version file",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "file": "README.md",
+                    "pattern": "Version: ([0-9.]+)\n"
+                },
+                {
+                    "file": "package.json",
+                    "pattern": "\"version\": \"([0-9.]+)\""
+                },
+                {
+                    "file": "VERSION",
+                    "pattern": ".*"
+                }
+            ],
+            "required": [
+                "file",
+                "pattern"
+            ],
+            "properties": {
+                "file": {
+                    "$id": "#/properties/version_input_file/properties/file",
+                    "type": "string",
+                    "title": "The file name",
+                    "examples": [
+                        "README.md",
+                        "package.json",
+                        "VERSION"
+                    ]
+                },
+                "pattern": {
+                    "$id": "#/properties/version_input_file/properties/pattern",
+                    "type": "string",
+                    "title": "The pattern to extract within the input version file",
+                    "default": "",
+                    "examples": [
+                        "Version: ([0-9.]+)\n",
+                        "\"version\": \"([0-9.]+)\"",
+                        ".*"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "version_input_tag": {
+            "$id": "#/properties/version_input_tag",
+            "type": "object",
+            "title": "Tag version input",
+            "default": {},
+            "examples": [
+                {
+                    "pattern": "^v?([0-9.]+)$"
+                }
+            ],
+            "required": [
+                "pattern"
+            ],
+            "properties": {
+                "pattern": {
+                    "$id": "#/properties/version_input_tag/properties/pattern",
+                    "type": "string",
+                    "title": "The pattern to extract from the tag",
+                    "examples": [
+                        "^v?([0-9.]+)$"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "template": {
+            "$id": "#/properties/template",
+            "type": "object",
+            "title": "The template schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "input_file": "build.go.tpl",
+                    "output_file": "build.go"
+                }
+            ],
+            "required": [
+                "input_file",
+                "output_file"
+            ],
+            "properties": {
+                "input_file": {
+                    "$id": "#/properties/template/properties/input_file",
+                    "type": "string",
+                    "title": "The template file",
+                    "examples": [
+                        "build.go.tpl"
+                    ]
+                },
+                "output_file": {
+                    "$id": "#/properties/template/properties/output_file",
+                    "type": "string",
+                    "title": "The output file",
+                    "examples": [
+                        "build.go"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "build_info_file": {
+            "$id": "#/properties/build_info_file",
+            "type": "string",
+            "title": "The JSON build file",
+            "examples": [
+                "build.json"
+            ]
+        },
+        "disable_git_cmd": {
+            "$id": "#/properties/disable_git_cmd",
+            "type": "boolean",
+            "title": "Disable GIT commands",
+            "default": false,
+            "examples": [
+                false
+            ]
+        }
+    },
+    "additionalProperties": false
+}
