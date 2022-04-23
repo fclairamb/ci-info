@@ -25,6 +25,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
 
+      - name: Fake build.go
+        run: |
+          ln -s build.go.tpl build.go
+
       # Running golangci-lint
       - name: Linting
         if: matrix.lint
