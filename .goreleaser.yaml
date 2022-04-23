@@ -1,6 +1,4 @@
 before:
   hooks:
-    - cmd: go build
-      output: true
-    - cmd: ./ci-info
-      output: true
+  - go build
+  - ./ci-info
