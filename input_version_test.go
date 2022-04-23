@@ -8,7 +8,7 @@ import (
 
 func TestInputVersionFile(t *testing.T) {
 	a := require.New(t)
-	version, err := getVersionFromFile("testdata/README.md", "Version: [0-9+\\.]+")
+	version, err := getVersionFromFile("testdata/README.md", "Version: ([0-9+\\.]+)")
 	a.Nil(err)
 	a.Equal("1.2.3", version)
 }

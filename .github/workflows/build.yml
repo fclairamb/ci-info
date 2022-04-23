@@ -39,7 +39,10 @@ jobs:
           go-version: ${{ matrix.go }}
 
       - name: Build
-        run: go build -v ./...
+        run: |
+          go build
+          ./ci-info
+          go build
 
       - name: Test
         # We need GCC because of the "go test -race"

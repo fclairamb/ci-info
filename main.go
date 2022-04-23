@@ -99,6 +99,59 @@ func getParams() *CmdParams {
 	return params
 }
 
+func generateBuildInfo(config *Config) (*BuildInfo, error) {
+	var err error
+
+	// The buildInfo struct is shared throughout the program to fill
+	// all possible info we can get from the current build
+	// and then export it to a json or template file.
+	buildInfo := &BuildInfo{
+		CIInfoVersion: BUILD_VERSION,
+	}
+
+	// We get the CI info from the current CI environment
+	if err = fetchCIInfo(buildInfo); err != nil {
+		return nil, fmt.Errorf("Failed to fetch CI info: %w", err)
+	}
+
+	// If GIT isn't disabled, we fetch the missing information using git commands
+	if !config.DisableGitCmd {
+		if err = fetchGitInfoWithCmd(buildInfo); err != nil {
+			return nil, fmt.Errorf("Failed to fetch git info: %w", err)
+		}
+	}
+
+	// We fill the buildInfo struct with some information built from other parts of the struct
+	if err := buildInfo.complete(); err != nil {
+		return nil, fmt.Errorf("Failed to complete build info: %w", err)
+	}
+
+	// At the very end we generate the version info
+	if err := buildInfo.loadVersion(config); err != nil {
+		return nil, fmt.Errorf("Failed to load version info: %w", err)
+	}
+
+	return buildInfo, nil
+}
+
+func saveOutputFiles(config *Config, buildInfo *BuildInfo) error {
+	// If requested, we export the build info to a json file
+	if config.BuildInfoFile != "" {
+		if err := buildInfo.save(config.BuildInfoFile); err != nil {
+			return fmt.Errorf("Failed to save build info: %w", err)
+		}
+	}
+
+	// If request, we generate the build info file from a template
+	if config.Template.OutputFile != "" {
+		if err := applyTemplate(config.Template.InputFile, config.Template.OutputFile, buildInfo); err != nil {
+			return fmt.Errorf("Failed to apply template: %w", err)
+		}
+	}
+
+	return nil
+}
+
 func main() {
 	params := getParams()
 
@@ -136,36 +189,9 @@ func main() {
 		config.BuildInfoFile = params.BuildInfoFile
 	}
 
-	// The buildInfo struct is shared throughout the program to fill
-	// all possible info we can get from the current build
-	// and then export it to a json or template file.
-	buildInfo := &BuildInfo{
-		CIInfoVersion: BUILD_VERSION,
-	}
-
-	// We get the CI info from the current CI environment
-	if err = fetchCIInfo(buildInfo); err != nil {
-		log.Crit("Failed to fetch CI info", "err", err)
-		os.Exit(1)
-	}
-
-	// If GIT isn't disabled, we fetch the missing information using git commands
-	if !config.DisableGitCmd {
-		if err = fetchGitInfoWithCmd(buildInfo); err != nil {
-			log.Crit("Failed to fetch git info", "err", err)
-			os.Exit(1)
-		}
-	}
-
-	// We fill the buildInfo struct with some information built from other parts of the struct
-	if err := buildInfo.complete(); err != nil {
-		log.Error("Failed to complete build info", "err", err)
-		os.Exit(1)
-	}
-
-	// At the very end we generate the version info
-	if err := buildInfo.loadVersion(config); err != nil {
-		log.Error("Failed to load version info", "err", err)
+	var buildInfo *BuildInfo
+	if buildInfo, err = generateBuildInfo(config); err != nil {
+		log.Crit("Failed to generate build info", "err", err)
 		os.Exit(1)
 	}
 
@@ -176,20 +202,10 @@ func main() {
 
 	log.Info("Fetched build info", "buildInfo", buildInfo)
 
-	// If requested, we export the build info to a json file
-	if config.BuildInfoFile != "" {
-		if err = buildInfo.save(config.BuildInfoFile); err != nil {
-			log.Error("Failed to save build info", "err", err)
-			os.Exit(1)
-		}
-	}
-
-	// If request, we generate the build info file from a template
-	if config.Template.OutputFile != "" {
-		if err := applyTemplate(config.Template.InputFile, config.Template.OutputFile, buildInfo); err != nil {
-			log.Crit("Failed to apply template", "err", err)
-			os.Exit(1)
-		}
+	// And then we generate all the output files
+	if err = saveOutputFiles(config, buildInfo); err != nil {
+		log.Crit("Failed to save output files", "err", err)
+		os.Exit(1)
 	}
 }
 

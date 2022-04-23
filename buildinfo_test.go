@@ -54,11 +54,31 @@ func TestSave(t *testing.T) {
 	a := require.New(t)
 	bi := &BuildInfo{
 		VersionDeclared: "1.2.3",
-		CommitHash:      "abcdef",
+		CommitHash:      "a6850c90c8d3c81377cee5701f79dfbbd6e5a756",
 		CommitDate:      "2022-04-21 11:52:09 +0200",
 		CommitBranch:    "main",
 	}
 	a.Nil(bi.complete())
 	a.Nil(bi.save("/tmp/buildinfo.json"))
 	a.NotNil(bi.save("/not-existing-path/buildinfo.json"))
+}
+
+func TestReadme(t *testing.T) {
+	a := require.New(t)
+	config := &Config{
+		Template: ConfigTemplate{
+			InputFile:  "README.md",
+			OutputFile: "/tmp/README.md",
+		},
+		InputVersionFile: ConfigVersionInputFile{
+			File:    "README.md",
+			Pattern: "Version: ([0-9+\\.]+)",
+		},
+	}
+	bi, err := generateBuildInfo(config)
+	a.NoError(err)
+	a.NotNil(bi)
+	a.NotEmpty(bi.Version)
+
+	a.NoError(saveOutputFiles(config, bi))
 }
