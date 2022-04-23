@@ -14,7 +14,7 @@ func TestFetchGitInfoWithCmd(t *testing.T) {
 	a.NotEmpty(bi.CommitHash)
 
 	// Github creates a detached branch for PRs and this prevents from detecting a branch:
-	if os.Getenv("GITHUB_ACTION") != "" {
+	if os.Getenv("GITHUB_ACTION") == "" {
 		a.NotEmpty(bi.CommitBranch)
 	}
 
@@ -23,7 +23,7 @@ func TestFetchGitInfoWithCmd(t *testing.T) {
 
 	a.Nil(bi.complete())
 
-	if os.Getenv("GITHUB_ACTION") != "" {
+	if os.Getenv("GITHUB_ACTION") == "" {
 		a.NotEmpty(bi.CommitBranchClean)
 	}
 
