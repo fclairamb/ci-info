@@ -24,6 +24,7 @@ The most popular continuous integration services are suported.
 
 ## Possible template arguments
 | Argument | Description |
+| -------- | ----------- |
 | {{ .Version }} | The automatically generated version. This is mix of the declared one and the current GIT info. |
 | {{ .CommitHash }} | The current GIT commit |
 | {{ .CommitHashShort }} | The current GIT branch |
