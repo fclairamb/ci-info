@@ -16,6 +16,10 @@ jobs:
       -
         name: Set up Go
         uses: actions/setup-go@v3
+      - name: self version
+        run: |
+          go build
+          ./ci-info
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
