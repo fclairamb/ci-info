@@ -1,4 +1,3 @@
 builds:
-  -
-    ldflags:
+  - ldflags:
       - -s -w -X main.BuildVersion={{.Version}} -X main.Commit={{.Commit}} -X main.BuildDate={{.Date}}
