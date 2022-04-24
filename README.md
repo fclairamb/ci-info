@@ -54,6 +54,6 @@ The `.ci-info.json` looks like this:
 | `{{ .CommitTag }}` | `v0.1.0` | The current GIT tag |
 | `{{ .CommitRef }}` | `v0.1.0` | The current GIT tag or branch |
 | `{{ .CommitSmart }}` | `fix-pr-check-f96a756` | The current GIT commit described by tag, otherwise branch + hash, otherwise hash |
-| `{{ .BuildTime }}` | `2022-04-23-2210` | The build time |
+| `{{ .BuildDate }}` | `2022-04-23-2210` | The build time |
 | `{{ .BuildHost }}` | `build-server` | The build host |
 | `{{ .BuildUser }}` | `runner` | The build user |
