@@ -16,12 +16,6 @@ jobs:
       -
         name: Set up Go
         uses: actions/setup-go@v3
-      - name: self version
-        run: |
-          cp build.go.tpl build.go
-          go build
-          ./ci-info
-          git diff
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2

@@ -1,6 +1,5 @@
 ci-info
 build.json
-build.go
 __debug_bin
 tmp/
 .vscode/
