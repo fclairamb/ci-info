@@ -1,12 +1,12 @@
 package main
 
 const (
-    // BUILD_VERSION is the current version of the program
-    BUILD_VERSION = "{{ .Version }}"
+	// BuildVersion is the current version of the program
+	BuildVersion = "{{ .Version }}"
 
-    // BUILD_TIME is the time the program was built
-    BUILD_TIME = "{{ .BuildTime }}"
+	// BuildDate is the time the program was built
+	BuildDate = "{{ .BuildDate }}"
 
-    // COMMIT_SMART is the git hash of the program
-    COMMIT_SMART = "{{ .CommitSmart }}"
+	// Commit is the git hash of the program
+	Commit = "{{ .CommitSmart }}"
 )

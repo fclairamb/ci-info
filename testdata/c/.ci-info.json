@@ -7,8 +7,8 @@
     "pattern": "^v?([0-9.]+)$"
   },
   "template": {
-    "input_file": "build.go.tpl",
-    "output_file": "build.go"
+    "input_file": "version.c.tpl",
+    "output_file": "version.c"
   },
   "build_info_file": "build.json",
   "disabled_git_cmd": true

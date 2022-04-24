@@ -24,7 +24,7 @@ type BuildInfo struct {
 	CommitTag         string `json:"git_tag,omitempty"`
 	CommitRef         string `json:"-"`
 	CommitSmart       string `json:"-"`
-	BuildTime         string `json:"build_time,omitempty"`
+	BuildDate         string `json:"build_date,omitempty"`
 	BuildHost         string `json:"build_host,omitempty"`
 	BuildUser         string `json:"build_user,omitempty"`
 }
@@ -70,8 +70,8 @@ func (bi *BuildInfo) complete() error {
 		bi.BuildUser = os.Getenv("USER")
 	}
 
-	if bi.BuildTime == "" {
-		bi.BuildTime = time.Now().UTC().Format(TIME_FORMAT)
+	if bi.BuildDate == "" {
+		bi.BuildDate = time.Now().UTC().Format(TIME_FORMAT)
 	}
 
 	return nil
