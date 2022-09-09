@@ -151,14 +151,14 @@
                 "build.json"
             ]
         },
-        "disable_git_cmd": {
+        "git_cmd_mode ": {
             "$id": "#/properties/disable_git_cmd",
             "type": "boolean",
-            "title": "Disable GIT commands",
+            "title": "GIT with cmd mode",
             "default": false,
             "examples": [
                 false
-            ]
+            ] 
         }
     },
     "additionalProperties": false
