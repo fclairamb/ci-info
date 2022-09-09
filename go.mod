@@ -1,6 +1,6 @@
 module github.com/fclairamb/ci-info
 
-go 1.18
+go 1.19
 
 require github.com/inconshreveable/log15 v0.0.0-20201112154412-8562bdadbbac
 
@@ -17,11 +17,6 @@ require (
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/xanzy/ssh-agent v0.3.0 // indirect
-	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
-	golang.org/x/net v0.0.0-20210326060303-6b1517762897 // indirect
-	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
 
@@ -30,6 +25,6 @@ require (
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.8.0
 	golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6 // indirect
 )
