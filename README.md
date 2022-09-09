@@ -7,13 +7,13 @@ Version: 0.1.0
 Adding the CI info useful to identify what was used to build any app. Yet, doing it properly is boring.
 
 ## How
-Your provide a template file and it will take care of writing the final file with the build information.
+You provide a template file and it will take care of writing the final file with the build information.
 
 This makes it completely language agnostic.
 
 ## Supported CI
 
-The most popular continuous integration services are suported.
+The most popular continuous integration services are supported.
 
 - [CircleCI](https://circleci.com/)
 - [GitHub Actions](https://github.com/features/actions)

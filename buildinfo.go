@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"time"
@@ -11,6 +10,7 @@ import (
 	log "github.com/inconshreveable/log15"
 )
 
+// BuildInfo contains all the information about the build
 type BuildInfo struct {
 	CIInfoVersion     string `json:"ci_info_version"`
 	VersionDeclared   string `json:"-"`
@@ -31,7 +31,7 @@ type BuildInfo struct {
 
 var reBranchClean = regexp.MustCompile(`[^a-zA-Z0-9_\-]+`)
 
-const TIME_FORMAT = "2006-01-02-1504"
+const timeFormat = "2006-01-02-1504"
 
 func (bi *BuildInfo) complete() error {
 	if bi.CommitHash != "" {
@@ -43,18 +43,22 @@ func (bi *BuildInfo) complete() error {
 		if err != nil {
 			return fmt.Errorf("could not parse commit date: %w", err)
 		}
-		bi.CommitDateClean = date.UTC().Format(TIME_FORMAT)
+
+		bi.CommitDateClean = date.UTC().Format(timeFormat)
 	}
+
 	if bi.CommitBranch != "" {
 		bi.CommitBranchClean = reBranchClean.ReplaceAllString(bi.CommitBranch, "-")
 	}
-	if bi.CommitTag != "" {
+
+	switch {
+	case bi.CommitTag != "":
 		bi.CommitRef = bi.CommitTag
 		bi.CommitSmart = bi.CommitTag
-	} else if bi.CommitBranchClean != "" {
+	case bi.CommitBranchClean != "":
 		bi.CommitRef = bi.CommitBranchClean
 		bi.CommitSmart = bi.CommitBranchClean + "-" + bi.CommitHashShort
-	} else {
+	default:
 		bi.CommitSmart = bi.CommitHashShort
 	}
 
@@ -71,7 +75,7 @@ func (bi *BuildInfo) complete() error {
 	}
 
 	if bi.BuildDate == "" {
-		bi.BuildDate = time.Now().UTC().Format(TIME_FORMAT)
+		bi.BuildDate = time.Now().UTC().Format(timeFormat)
 	}
 
 	return nil
@@ -83,7 +87,7 @@ func (bi *BuildInfo) save(fileName string) error {
 		return fmt.Errorf("could not marshal build info: %w", err)
 	}
 
-	return ioutil.WriteFile(fileName, content, 0644)
+	return os.WriteFile(fileName, content, 0600)
 }
 
 func (bi *BuildInfo) loadVersion(config *Config) error {
@@ -99,16 +103,17 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 	}
 
 	if fileVersion, err = getVersionFromFile(config.InputVersionFile.File, config.InputVersionFile.Pattern); err != nil {
-		return fmt.Errorf("Failed to get version from file: %w", err)
+		return fmt.Errorf("failed to get version from file: %w", err)
 	}
 
-	if envVersion != "" {
+	switch {
+	case envVersion != "":
 		bi.VersionDeclared = envVersion
 		bi.Version = envVersion
-	} else if tagVersion != "" {
+	case tagVersion != "":
 		bi.VersionDeclared = tagVersion
 		bi.Version = tagVersion
-	} else if fileVersion != "" {
+	case fileVersion != "":
 		bi.VersionDeclared = fileVersion
 		bi.Version = fileVersion + "-" + bi.CommitSmart
 	}

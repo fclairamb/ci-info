@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"text/template"
 
 	log "github.com/inconshreveable/log15"
 )
 
-// CLI parameters
+// CmdParams contains the command line parameters
 type CmdParams struct {
 	ConfigFile    string
 	BuildInfoFile string
@@ -26,11 +25,12 @@ type ConfigVersionInputFile struct {
 	Pattern string `json:"pattern"`
 }
 
+// ConfigVersionInputTag defines how we shall fetch the input version
 type ConfigVersionInputTag struct {
 	Pattern string `json:"pattern"`
 }
 
-// ConfigTemplate
+// ConfigTemplate defines the template configuration
 type ConfigTemplate struct {
 	InputFile  string `json:"input_file"`
 	OutputFile string `json:"output_file"`
@@ -42,7 +42,7 @@ type Config struct {
 	InputVersionTag  ConfigVersionInputTag  `json:"version_input_tag"`
 	Template         ConfigTemplate         `json:"template"`
 	BuildInfoFile    string                 `json:"build_info_file"`
-	DisableGitCmd    bool                   `json:"disable_git_cmd"`
+	GitCmdMode       bool                   `json:"git_cmd_mode"`
 }
 
 type gitInfoFetch struct {
@@ -50,18 +50,21 @@ type gitInfoFetch struct {
 	command []string
 }
 
-const DefaultConfigFile = ".ci-info.json"
+const defaultConfigFile = ".ci-info.json"
 
 func loadConfig(fileName string) (*Config, error) {
-	jsonContent, err := ioutil.ReadFile(fileName)
+	jsonContent, err := os.ReadFile(fileName) //nolint:gosec
 	if err != nil {
 		return nil, err
 	}
+
 	config := &Config{}
 	err = json.Unmarshal(jsonContent, config)
+
 	if err != nil {
 		return nil, err
 	}
+
 	return config, nil
 }
 
@@ -85,10 +88,12 @@ func createDefaultConfig() *Config {
 func saveDefaultConfig(params *CmdParams) error {
 	config := createDefaultConfig()
 	jsonContent, err := json.MarshalIndent(config, "", "  ")
+
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(params.ConfigFile, jsonContent, 0644)
+
+	return os.WriteFile(params.ConfigFile, jsonContent, 0600)
 }
 
 func getParams() *CmdParams {
@@ -98,6 +103,7 @@ func getParams() *CmdParams {
 	flag.StringVar(&params.BuildInfoFile, "b", "", "build info file")
 	flag.BoolVar(&params.Init, "init", false, "init config file")
 	flag.Parse()
+
 	return params
 }
 
@@ -113,24 +119,28 @@ func generateBuildInfo(config *Config) (*BuildInfo, error) {
 
 	// We get the CI info from the current CI environment
 	if err = fetchCIInfo(buildInfo); err != nil {
-		return nil, fmt.Errorf("Failed to fetch CI info: %w", err)
+		return nil, fmt.Errorf("failed to fetch CI info: %w", err)
 	}
 
 	// If GIT isn't disabled, we fetch the missing information using git commands
-	if !config.DisableGitCmd {
+	if config.GitCmdMode {
 		if err = fetchGitInfoWithCmd(buildInfo); err != nil {
-			return nil, fmt.Errorf("Failed to fetch git info: %w", err)
+			return nil, fmt.Errorf("failed to fetch git info: %w", err)
+		}
+	} else {
+		if err = fetchGitInfoNative(buildInfo); err != nil {
+			return nil, fmt.Errorf("failed to fetch git info: %w", err)
 		}
 	}
 
 	// We fill the buildInfo struct with some information built from other parts of the struct
 	if err := buildInfo.complete(); err != nil {
-		return nil, fmt.Errorf("Failed to complete build info: %w", err)
+		return nil, fmt.Errorf("failed to complete build info: %w", err)
 	}
 
 	// At the very end we generate the version info
 	if err := buildInfo.loadVersion(config); err != nil {
-		return nil, fmt.Errorf("Failed to load version info: %w", err)
+		return nil, fmt.Errorf("failed to load version info: %w", err)
 	}
 
 	return buildInfo, nil
@@ -140,14 +150,14 @@ func saveOutputFiles(config *Config, buildInfo *BuildInfo) error {
 	// If requested, we export the build info to a json file
 	if config.BuildInfoFile != "" {
 		if err := buildInfo.save(config.BuildInfoFile); err != nil {
-			return fmt.Errorf("Failed to save build info: %w", err)
+			return fmt.Errorf("failed to save build info: %w", err)
 		}
 	}
 
 	// If request, we generate the build info file from a template
 	if config.Template.OutputFile != "" {
 		if err := applyTemplate(config.Template.InputFile, config.Template.OutputFile, buildInfo); err != nil {
-			return fmt.Errorf("Failed to apply template: %w", err)
+			return fmt.Errorf("failed to apply template: %w", err)
 		}
 	}
 
@@ -179,8 +189,8 @@ func main() {
 	}
 
 	if params.ConfigFile == "" {
-		if _, err := os.Stat(DefaultConfigFile); err == nil {
-			params.ConfigFile = DefaultConfigFile
+		if _, errStat := os.Stat(defaultConfigFile); errStat == nil {
+			params.ConfigFile = defaultConfigFile
 		}
 	}
 
@@ -202,6 +212,7 @@ func main() {
 	}
 
 	var buildInfo *BuildInfo
+
 	if buildInfo, err = generateBuildInfo(config); err != nil {
 		log.Crit("Failed to generate build info", "err", err)
 		os.Exit(1)
@@ -223,22 +234,23 @@ func main() {
 
 func applyTemplate(inputFile string, outputFile string, buildInfo *BuildInfo) error {
 	var templateString string
-	if input, err := ioutil.ReadFile(inputFile); err != nil {
-		return fmt.Errorf("could not read input file: %w", err)
-	} else {
+	if input, err := os.ReadFile(inputFile); err == nil { //nolint:gosec
 		templateString = string(input)
+	} else {
+		return fmt.Errorf("could not read input file: %w", err)
 	}
 
 	var buffer bytes.Buffer
-	if tpl, err := template.New(inputFile).Parse(templateString); err != nil {
-		return fmt.Errorf("could not parse template: %w", err)
-	} else {
-		if err := tpl.Execute(&buffer, buildInfo); err != nil {
+
+	if tpl, err := template.New(inputFile).Parse(templateString); err == nil {
+		if errExec := tpl.Execute(&buffer, buildInfo); errExec != nil {
 			return fmt.Errorf("could not execute template: %w", err)
 		}
+	} else {
+		return fmt.Errorf("could not parse template: %w", err)
 	}
 
-	if err := ioutil.WriteFile(outputFile, buffer.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(outputFile, buffer.Bytes(), 0600); err != nil {
 		return fmt.Errorf("could not write output file: %w", err)
 	}
 
