@@ -16,5 +16,5 @@ RUN go build -ldflags="-w -s" -v -o ci-info
 # FROM alpine:3.16.2
 FROM scratch
 WORKDIR /work
-COPY --from=builder /workspace/ftpserver /bin/ftpserver
+COPY --from=builder /build/ci-info /build/ci-info
 ENTRYPOINT [ "/bin/ci-info" ]
