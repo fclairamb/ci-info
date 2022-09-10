@@ -3,18 +3,17 @@
 
 # Preparing the build environment
 FROM golang:1.19-alpine AS builder
-ENV GOFLAGS="-mod=readonly"
 RUN apk add --update --no-cache bash ca-certificates curl git
 RUN mkdir -p /build
 WORKDIR /build
 
 # Building
 COPY . .
-RUN go build -ldflags="-w -s" -v -o ci-info
+RUN go build -mod=readonly -ldflags="-w -s" -v -o ci-info
 
 # Preparing the final image
 # FROM alpine:3.16.2
 FROM scratch
 WORKDIR /work
-COPY --from=builder /build/ci-info /build/ci-info
+COPY --from=builder /build/ci-info /bin/ci-info
 ENTRYPOINT [ "/bin/ci-info" ]
