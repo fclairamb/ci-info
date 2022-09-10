@@ -1,11 +1,11 @@
-name: JSONSchema check
+name: json-schema
 
 on:
   push:
   pull_request:
 
 jobs:
-  json-schema-check:
+  check:
     runs-on: ubuntu-22.04
     container: python:3.10-alpine3.16
     steps:
