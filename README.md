@@ -9,7 +9,7 @@ Adding the CI info useful to identify what was used to build any app. Yet, doing
 ## How
 You provide a template file and it will take care of writing the final file with the build information.
 
-This makes it completely language agnostic.
+This makes it completely language-agnostic.
 
 ## Supported CI
 
