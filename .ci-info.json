@@ -8,7 +8,6 @@
     "pattern": "^v?([0-9.]+)$"
   },
   "templates": [{
-    "input_content": "package main\n\nconst version = \"{{ .Version }}\"\n",
     "input_file": "build.go.tpl",
     "output_file": "build.go"
   }],

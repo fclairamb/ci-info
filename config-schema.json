@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://raw.githubusercontent.com/fclairamb/ci-info/main/config-schema.json",
     "type": "object",
     "title": "CI-Info config schema",
@@ -19,7 +19,7 @@
                 "output_file": "build.go"
             },
             "build_info_file": "build.json",
-            "disable_git_cmd": false
+            "git_cmd_mode": false
         }
     ],
     "required": [],
@@ -180,13 +180,23 @@
                 "build.json"
             ]
         },
-        "git_cmd_mode ": {
-            "$id": "/properties/disable_git_cmd",
+        "git_cmd_mode": {
+            "$id": "/properties/git_cmd_mode",
             "type": "boolean",
             "title": "GIT with cmd mode",
             "default": false,
             "examples": [
                 false
+            ]
+        },
+        "$schema": {
+            "$id": "/properties/$schema",
+            "type": "string",
+            "title": "The $schema schema",
+            "description": "Allow to declare the schema",
+            "default": "https://raw.githubusercontent.com/fclairamb/ci-info/main/config-schema.json",
+            "examples": [
+                "https://raw.githubusercontent.com/fclairamb/ci-info/main/config-schema.json"
             ]
         }
     },
