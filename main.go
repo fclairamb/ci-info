@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -10,91 +9,6 @@ import (
 
 	log "github.com/inconshreveable/log15"
 )
-
-// CmdParams contains the command line parameters
-type CmdParams struct {
-	ConfigFile    string
-	BuildInfoFile string
-	Version       bool
-	Init          bool
-}
-
-// ConfigVersionInputFile defines how we shall fetch the input version
-type ConfigVersionInputFile struct {
-	File    string `json:"file"`
-	Pattern string `json:"pattern"`
-}
-
-// ConfigVersionInputTag defines how we shall fetch the input version
-type ConfigVersionInputTag struct {
-	Pattern string `json:"pattern"`
-}
-
-// ConfigTemplate defines the template configuration
-type ConfigTemplate struct {
-	InputFile  string `json:"input_file"`
-	OutputFile string `json:"output_file"`
-}
-
-// Config defines the configuration for ci-info
-type Config struct {
-	InputVersionFile ConfigVersionInputFile `json:"version_input_file"`
-	InputVersionTag  ConfigVersionInputTag  `json:"version_input_tag"`
-	Template         ConfigTemplate         `json:"template"`
-	BuildInfoFile    string                 `json:"build_info_file"`
-	GitCmdMode       bool                   `json:"git_cmd_mode"`
-}
-
-type gitInfoFetch struct {
-	info    *string
-	command []string
-}
-
-const defaultConfigFile = ".ci-info.json"
-
-func loadConfig(fileName string) (*Config, error) {
-	jsonContent, err := os.ReadFile(fileName) //nolint:gosec
-	if err != nil {
-		return nil, err
-	}
-
-	config := &Config{}
-	err = json.Unmarshal(jsonContent, config)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return config, nil
-}
-
-func createDefaultConfig() *Config {
-	return &Config{
-		InputVersionFile: ConfigVersionInputFile{
-			File:    "README.md",
-			Pattern: "Version: ([0-9.]+)\n",
-		},
-		InputVersionTag: ConfigVersionInputTag{
-			Pattern: "^v?([0-9.]+)$",
-		},
-		Template: ConfigTemplate{
-			InputFile:  "build.go.tpl",
-			OutputFile: "build.go",
-		},
-		BuildInfoFile: "build.json",
-	}
-}
-
-func saveDefaultConfig(params *CmdParams) error {
-	config := createDefaultConfig()
-	jsonContent, err := json.MarshalIndent(config, "", "  ")
-
-	if err != nil {
-		return err
-	}
-
-	return os.WriteFile(params.ConfigFile, jsonContent, 0600)
-}
 
 func getParams() *CmdParams {
 	params := &CmdParams{}
@@ -155,9 +69,23 @@ func saveOutputFiles(config *Config, buildInfo *BuildInfo) error {
 	}
 
 	// If request, we generate the build info file from a template
-	if config.Template.OutputFile != "" {
-		if err := applyTemplate(config.Template.InputFile, config.Template.OutputFile, buildInfo); err != nil {
-			return fmt.Errorf("failed to apply template: %w", err)
+	for _, template := range config.Templates {
+		if template.OutputFile != "" {
+			var templateString string
+
+			if template.InputContent != "" {
+				templateString = template.InputContent
+			} else {
+				content, err := loadPathAsContent(template.InputFile)
+				if err != nil {
+					return fmt.Errorf("failed to load template file from %s: %w", template.InputFile, err)
+				}
+				templateString = string(content)
+			}
+
+			if err := applyTemplate(templateString, template.OutputFile, buildInfo); err != nil {
+				return fmt.Errorf("failed to apply template: %w", err)
+			}
 		}
 	}
 
@@ -165,8 +93,10 @@ func saveOutputFiles(config *Config, buildInfo *BuildInfo) error {
 }
 
 func main() {
-	params := getParams()
+	runMain(getParams())
+}
 
+func runMain(params *CmdParams) {
 	var config *Config
 	var err error
 
@@ -204,6 +134,13 @@ func main() {
 		config = &Config{}
 	}
 
+	if params.VersionFile != "" {
+		config.Templates = append(config.Templates, &ConfigTemplate{
+			InputContent: "{{ .Version }}",
+			OutputFile:   params.VersionFile,
+		})
+	}
+
 	log.Debug("Loaded config", "config", config)
 
 	// If specified, we create the build info file
@@ -232,17 +169,10 @@ func main() {
 	}
 }
 
-func applyTemplate(inputFile string, outputFile string, buildInfo *BuildInfo) error {
-	var templateString string
-	if input, err := os.ReadFile(inputFile); err == nil { //nolint:gosec
-		templateString = string(input)
-	} else {
-		return fmt.Errorf("could not read input file: %w", err)
-	}
-
+func applyTemplate(templateString string, outputFile string, buildInfo *BuildInfo) error {
 	var buffer bytes.Buffer
 
-	if tpl, err := template.New(inputFile).Parse(templateString); err == nil {
+	if tpl, err := template.New("").Parse(templateString); err == nil {
 		if errExec := tpl.Execute(&buffer, buildInfo); errExec != nil {
 			return fmt.Errorf("could not execute template: %w", err)
 		}

@@ -95,6 +95,11 @@ func fetchGitInfoNative(info *BuildInfo) error {
 }
 
 func fetchGitInfoWithCmd(info *BuildInfo) error {
+	type gitInfoFetch struct {
+		info    *string
+		command []string
+	}
+
 	var gitCommands = []gitInfoFetch{
 		{&info.CommitTag, []string{"git", "tag", "--points-at", "HEAD"}},
 		{&info.CommitHash, []string{"git", "rev-parse", "HEAD"}},
