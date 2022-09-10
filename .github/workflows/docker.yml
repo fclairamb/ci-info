@@ -48,7 +48,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7,linux/386
+          platforms: linux/386 # linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7,
           push: ${{ github.repository == 'fclairamb/ci-info' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
