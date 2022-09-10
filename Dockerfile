@@ -3,13 +3,13 @@
 
 # Preparing the build environment
 FROM golang:1.19-alpine AS builder
-RUN apk add --update --no-cache bash ca-certificates curl git
+# RUN apk add --update --no-cache bash ca-certificates curl git
 RUN mkdir -p /build
 WORKDIR /build
 
 # Building
 COPY . .
-RUN go build -mod=readonly -ldflags="-w -s" -v -o ci-info 
+RUN CGO_ENABLED=0 go build -mod=readonly -ldflags='-w -s' -v -o ci-info 
 
 # Preparing the final image
 # FROM alpine:3.16.2
