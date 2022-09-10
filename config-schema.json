@@ -22,19 +22,10 @@
             "disable_git_cmd": false
         }
     ],
-    "required": [
-    ],
+    "required": [],
     "properties": {
-        "$schema": {
-            "type": "string",
-            "title": "Schema",
-            "description": "The schema declaration",
-            "examples": [
-                "https://raw.githubusercontent.com/fclairamb/ci-info/main/config-schema.json"
-            ]
-        },
         "version_input_file": {
-            "$id": "#/properties/version_input_file",
+            "$id": "/properties/version_input_file",
             "type": "object",
             "title": "The input version file",
             "description": "An explanation about the purpose of this instance.",
@@ -59,7 +50,7 @@
             ],
             "properties": {
                 "file": {
-                    "$id": "#/properties/version_input_file/properties/file",
+                    "$id": "/properties/version_input_file/properties/file",
                     "type": "string",
                     "title": "The file name",
                     "examples": [
@@ -69,7 +60,7 @@
                     ]
                 },
                 "pattern": {
-                    "$id": "#/properties/version_input_file/properties/pattern",
+                    "$id": "/properties/version_input_file/properties/pattern",
                     "type": "string",
                     "title": "The pattern to extract within the input version file",
                     "default": "",
@@ -83,7 +74,7 @@
             "additionalProperties": false
         },
         "version_input_tag": {
-            "$id": "#/properties/version_input_tag",
+            "$id": "/properties/version_input_tag",
             "type": "object",
             "title": "Tag version input",
             "default": {},
@@ -97,7 +88,7 @@
             ],
             "properties": {
                 "pattern": {
-                    "$id": "#/properties/version_input_tag/properties/pattern",
+                    "$id": "/properties/version_input_tag/properties/pattern",
                     "type": "string",
                     "title": "The pattern to extract from the tag",
                     "examples": [
@@ -107,44 +98,82 @@
             },
             "additionalProperties": false
         },
-        "template": {
-            "$id": "#/properties/template",
-            "type": "object",
-            "title": "The template schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": {},
+        "templates": {
+            "$id": "/properties/templates",
+            "type": "array",
+            "title": "Templates to apply",
+            "default": [],
             "examples": [
                 {
-                    "input_file": "build.go.tpl",
-                    "output_file": "build.go"
+                    "templates": [
+                        {
+                            "input_file": "build.go.tpl",
+                            "output_file": "build.go"
+                        }
+                    ]
                 }
             ],
-            "required": [
-                "input_file",
-                "output_file"
-            ],
-            "properties": {
-                "input_file": {
-                    "$id": "#/properties/template/properties/input_file",
-                    "type": "string",
-                    "title": "The template file",
-                    "examples": [
-                        "build.go.tpl"
-                    ]
+            "items": {
+                "$id": "/properties/templates/template",
+                "type": "object",
+                "title": "The template schema",
+                "description": "An explanation about the purpose of this instance.",
+                "default": {},
+                "examples": [
+                    {
+                        "input_file": "build.go.tpl",
+                        "output_file": "build.go"
+                    },
+                    {
+                        "input_content": "package main\n\nconst version = \"{{ .Version }}\"\n",
+                        "output_file": "version.go"
+                    }
+                ],
+                "oneOf": [
+                    {
+                        "required": [
+                            "input_file",
+                            "output_file"
+                        ]
+                    },
+                    {
+                        "required": [
+                            "input_content",
+                            "output_file"
+                        ]
+                    }
+                ],
+                "properties": {
+                    "input_file": {
+                        "$id": "/properties/template/properties/input_file",
+                        "type": "string",
+                        "title": "The template file",
+                        "examples": [
+                            "build.go.tpl"
+                        ]
+                    },
+                    "input_content": {
+                        "$id": "/properties/template/properties/input_content",
+                        "type": "string",
+                        "title": "The template content",
+                        "examples": [
+                            "package main\n\nconst (\n\t// Version is the version of the application\n\tVersion = \"{{ .Version }}\"\n\n\t)\n"
+                        ]
+                    },
+                    "output_file": {
+                        "$id": "/properties/template/properties/output_file",
+                        "type": "string",
+                        "title": "The output file",
+                        "examples": [
+                            "build.go"
+                        ]
+                    }
                 },
-                "output_file": {
-                    "$id": "#/properties/template/properties/output_file",
-                    "type": "string",
-                    "title": "The output file",
-                    "examples": [
-                        "build.go"
-                    ]
-                }
-            },
-            "additionalProperties": false
+                "additionalProperties": false
+            }
         },
         "build_info_file": {
-            "$id": "#/properties/build_info_file",
+            "$id": "/properties/build_info_file",
             "type": "string",
             "title": "The JSON build file",
             "examples": [
@@ -152,13 +181,13 @@
             ]
         },
         "git_cmd_mode ": {
-            "$id": "#/properties/disable_git_cmd",
+            "$id": "/properties/disable_git_cmd",
             "type": "boolean",
             "title": "GIT with cmd mode",
             "default": false,
             "examples": [
                 false
-            ] 
+            ]
         }
     },
     "additionalProperties": false
