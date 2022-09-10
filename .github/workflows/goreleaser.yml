@@ -20,7 +20,7 @@ jobs:
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
-          version: 1.19
+          version: latest
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
