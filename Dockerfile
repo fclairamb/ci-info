@@ -9,7 +9,7 @@ WORKDIR /build
 
 # Building
 COPY . .
-RUN go build -mod=readonly -ldflags="-w -s" -v -o ci-info
+RUN go build -mod=readonly -ldflags="-w -s" -v -o ci-info 
 
 # Preparing the final image
 # FROM alpine:3.16.2
