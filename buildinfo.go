@@ -27,6 +27,9 @@ type BuildInfo struct {
 	BuildDate         string `json:"build_date,omitempty"`
 	BuildHost         string `json:"build_host,omitempty"`
 	BuildUser         string `json:"build_user,omitempty"`
+	CISolution        string `json:"ci_solution,omitempty"`
+	CIBuildNumber     string `json:"ci_job_id,omitempty"`
+	PackageManager    string `json:"package_manager,omitempty"`
 }
 
 var reBranchClean = regexp.MustCompile(`[^a-zA-Z0-9_\-]+`)
@@ -102,8 +105,16 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 		}
 	}
 
-	if fileVersion, err = getVersionFromFile(config.InputVersionFile.File, config.InputVersionFile.Pattern); err != nil {
-		return fmt.Errorf("failed to get version from file: %w", err)
+	if config.InputVersionFile.File != "" {
+		if fileVersion, err = getVersionFromFile(config.InputVersionFile.File, config.InputVersionFile.Pattern); err != nil {
+			return fmt.Errorf("failed to get version from file: %w", err)
+		}
+	}
+
+	if fileVersion == "" {
+		if err = fetchPackageManagerInfo(buildInfo); err != nil {
+			return nil, fmt.Errorf("failed to fetch package manager info: %w", err)
+		}
 	}
 
 	switch {

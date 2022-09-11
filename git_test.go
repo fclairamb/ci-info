@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -19,6 +20,19 @@ func TestFetchGitInfoNative(t *testing.T) {
 	bi := &BuildInfo{}
 	a.NoError(fetchGitInfoNative(bi))
 	testGitInfo(a, bi)
+}
+
+func TestGitInSubpath(t *testing.T) {
+	a := require.New(t)
+
+	dir, err := os.Getwd()
+	a.NoError(err)
+
+	dir = path.Join(dir, "testdata")
+
+	repo, err := getRepo(dir)
+	a.NoError(err)
+	a.NotNil(repo)
 }
 
 func testGitInfo(a *require.Assertions, bi *BuildInfo) {

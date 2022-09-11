@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 
 	git "github.com/go-git/go-git/v5"
@@ -12,27 +13,33 @@ import (
 
 // var repo *git.Repository
 
-func getRepo() (*git.Repository, error) {
-	var repo *git.Repository
-	if repo != nil {
-		return repo, nil
+func getRepo(dir string) (*git.Repository, error) {
+	if dir == "" {
+		var errCwd error
+		dir, errCwd = os.Getwd()
+
+		if errCwd != nil {
+			return nil, errCwd
+		}
 	}
 
-	dir, err := os.Getwd()
-	if err != nil {
-		return nil, err
+	for i := 0; i < 20; i++ {
+		if st, errSt := os.Stat(dir + "/.git"); errSt == nil {
+			if st.IsDir() {
+				break
+			}
+		} else if !os.IsNotExist(errSt) {
+			return nil, errSt
+		}
+
+		dir = path.Dir(dir)
 	}
 
-	repo, err = git.PlainOpen(dir)
-	if err != nil {
-		return nil, err
-	}
-
-	return repo, nil
+	return git.PlainOpen(dir)
 }
 
 func getHead() (*git.Repository, *plumbing.Reference, error) {
-	repo, err := getRepo()
+	repo, err := getRepo("")
 	if err != nil {
 		return nil, nil, err
 	}

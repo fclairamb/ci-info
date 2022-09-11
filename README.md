@@ -6,10 +6,31 @@ Version: 0.1.0
 ## Why
 Adding the CI info useful to identify what was used to build any app. Yet, doing it properly is boring.
 
-## How
+## How it works
 You provide a template file and it will take care of writing the final file with the build information.
 
 This makes it completely language-agnostic.
+
+## Very basic usage
+You can also completely skip the templating system:
+```zsh
+% ci-info -b build.json -vf version.txt
+
+% cat build.json  
+{
+  "ci_info_version": "0.1.0-feature-config-change-6ea1772",
+  "version": "0.1.0-feature-config-change-6ea1772",
+  "git_hash": "6ea17722aa995a6c69c67e833d3c5abee463f7da",
+  "git_date": "2022-09-10 22:51:17 +0200",
+  "git_branch": "feature/config-change",
+  "build_date": "2022-09-10-2126",
+  "build_host": "MBPdeFlorent2",
+  "build_user": "florent"
+}
+
+% cat version.txt
+0.1.0-feature-config-change-6ea1772
+```
 
 ## Supported CI
 
