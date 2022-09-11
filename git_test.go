@@ -8,18 +8,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestFetchGitInfoWithCmd(t *testing.T) {
+func TestFetchGitInfo(t *testing.T) {
 	a := require.New(t)
-	bi := &BuildInfo{}
-	a.NoError(fetchGitInfoWithCmd(bi))
-	testGitInfo(a, bi)
-}
 
-func TestFetchGitInfoNative(t *testing.T) {
-	a := require.New(t)
-	bi := &BuildInfo{}
-	a.NoError(fetchGitInfoNative(bi))
-	testGitInfo(a, bi)
+	t.Run("native", func(t *testing.T) {
+		bi := &BuildInfo{}
+		a.NoError(fetchGitInfo(bi, false))
+		testGitInfo(a, bi)
+	})
+
+	t.Run("cmd", func(t *testing.T) {
+		bi := &BuildInfo{}
+		a.NoError(fetchGitInfo(bi, true))
+		testGitInfo(a, bi)
+	})
 }
 
 func TestGitInSubpath(t *testing.T) {

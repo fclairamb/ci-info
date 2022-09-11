@@ -21,20 +21,28 @@ type ConfigVersionInputTag struct {
 	Pattern string `json:"pattern"`
 }
 
+// ConfigVersionInputEnvVar defines how we shall fetch the input version from an environment variable
+type ConfigVersionInputEnvVar struct {
+	EnvVar  string `json:"env_var"`
+	Pattern string `json:"pattern"`
+}
+
 // ConfigTemplate defines the template configuration
 type ConfigTemplate struct {
-	InputFile    string `json:"input_file"`
-	InputContent string `json:"input_content"`
+	InputFile    string `json:"input_file,omitempty"`
+	InputContent string `json:"input_content,omitempty"`
 	OutputFile   string `json:"output_file"`
 }
 
 // Config defines the configuration for ci-info
 type Config struct {
-	InputVersionFile ConfigVersionInputFile `json:"version_input_file"`
-	InputVersionTag  ConfigVersionInputTag  `json:"version_input_tag"`
-	Templates        []*ConfigTemplate      `json:"templates"`
-	BuildInfoFile    string                 `json:"build_info_file"`
-	GitCmdMode       bool                   `json:"git_cmd_mode"`
+	InputVersionFile   ConfigVersionInputFile   `json:"version_input_file"`
+	InputVersionTag    ConfigVersionInputTag    `json:"version_input_git_tag"`
+	InputVersionEnvVar ConfigVersionInputEnvVar `json:"version_input_env_var"`
+	Templates          []*ConfigTemplate        `json:"templates,omitempty"`
+	BuildInfoFile      string                   `json:"build_info_file,omitempty"`
+	GitCmdMode         bool                     `json:"git_cmd_mode,omitempty"`
+	Directory          string                   `json:"directory,omitempty"`
 }
 
 const defaultConfigFile = ".ci-info.json"
@@ -93,6 +101,10 @@ func createDefaultConfig() *Config {
 		},
 		InputVersionTag: ConfigVersionInputTag{
 			Pattern: "^v?([0-9.]+)$",
+		},
+		InputVersionEnvVar: ConfigVersionInputEnvVar{
+			EnvVar:  "VERSION",
+			Pattern: "^([0-9.]+)$",
 		},
 		Templates: []*ConfigTemplate{{
 			InputFile:  "build.go.tpl",

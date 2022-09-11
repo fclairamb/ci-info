@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,9 +13,11 @@ import (
 	log "github.com/inconshreveable/log15"
 )
 
-const true = "true"
+const sTrue = "true"
 const refBranch = "refs/heads/"
 const refTags = "refs/tags/"
+
+var errCouldNotFindVersion = errors.New("could not find version")
 
 var ciSolutionsFetchers = []CIInfoFetcher{
 	&circleCIInfoFetcher{},
@@ -72,7 +76,7 @@ type circleCIInfoFetcher struct{}
 
 // Detect if it's a suited fetcher
 func (c circleCIInfoFetcher) Detect() bool {
-	return os.Getenv("CIRCLECI") == true
+	return os.Getenv("CIRCLECI") == sTrue
 }
 
 // Fetch fetches the CI information
@@ -264,8 +268,9 @@ func (f gradleInfoFetcher) Fetch(bi *BuildInfo) error {
 
 	re := regexp.MustCompile(`version\s*=\s*['"](.*)['"]`)
 	matches := re.FindStringSubmatch(string(b))
+
 	if len(matches) != 2 {
-		return fmt.Errorf("unable to find version in build.gradle")
+		return fmt.Errorf("unable to find version in build.gradle: %w", errCouldNotFindVersion)
 	}
 
 	bi.VersionDeclared = matches[1]
@@ -289,20 +294,22 @@ func (f mavenInfoFetcher) Detect() bool {
 }
 
 // Fetch parses a pom.xml file and retrieve the version property
-// Status: Completely broken logic
+// Status: Should work
 func (f mavenInfoFetcher) Fetch(bi *BuildInfo) error {
 	b, err := os.ReadFile("pom.xml")
 	if err != nil {
 		return err
 	}
 
-	re := regexp.MustCompile(`<version>(.*)</version>`)
-	matches := re.FindStringSubmatch(string(b))
-	if len(matches) != 2 {
-		return fmt.Errorf("unable to find version in pom.xml")
+	var pom struct {
+		Version string `xml:"version"`
 	}
 
-	bi.VersionDeclared = matches[1]
+	if err := xml.Unmarshal(b, &pom); err != nil {
+		return err
+	}
+
+	bi.VersionDeclared = pom.Version
 
 	return nil
 }
@@ -331,7 +338,7 @@ func (f nugetInfoFetcher) Fetch(bi *BuildInfo) error {
 	}
 
 	if len(files) == 0 {
-		return fmt.Errorf("unable to find any csproj file")
+		return fmt.Errorf("unable to find any csproj file: %w", errCouldNotFindVersion)
 	}
 
 	b, err := os.ReadFile(files[0])
@@ -343,7 +350,7 @@ func (f nugetInfoFetcher) Fetch(bi *BuildInfo) error {
 	matches := re.FindStringSubmatch(string(b))
 
 	if len(matches) != 2 {
-		return fmt.Errorf("unable to find version in %s", files[0])
+		return fmt.Errorf("unable to find version in %s: %w", files[0], errCouldNotFindVersion)
 	}
 
 	bi.Version = matches[1]

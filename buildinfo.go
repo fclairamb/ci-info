@@ -28,7 +28,7 @@ type BuildInfo struct {
 	BuildHost         string `json:"build_host,omitempty"`
 	BuildUser         string `json:"build_user,omitempty"`
 	CISolution        string `json:"ci_solution,omitempty"`
-	CIBuildNumber     string `json:"ci_job_id,omitempty"`
+	CIBuildNumber     string `json:"ci_build_number,omitempty"`
 	PackageManager    string `json:"package_manager,omitempty"`
 }
 
@@ -97,7 +97,14 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 	var envVersion, tagVersion, fileVersion string
 	var err error
 
-	envVersion = os.Getenv("VERSION")
+	if config.InputVersionEnvVar.EnvVar != "" {
+		if envVarValue, ok := os.LookupEnv(config.InputVersionEnvVar.EnvVar); ok {
+			envVersion, err = getVersionFromContent(envVarValue, config.InputVersionEnvVar.Pattern)
+			if err != nil {
+				return fmt.Errorf("could not get version from env var %s: %w", config.InputVersionEnvVar.EnvVar, err)
+			}
+		}
+	}
 
 	if bi.CommitTag != "" && config.InputVersionTag.Pattern != "" {
 		if tagVersion, err = getVersionFromContent(bi.CommitTag, config.InputVersionTag.Pattern); err != nil {
@@ -112,8 +119,8 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 	}
 
 	if fileVersion == "" {
-		if err = fetchPackageManagerInfo(buildInfo); err != nil {
-			return nil, fmt.Errorf("failed to fetch package manager info: %w", err)
+		if err = fetchPackageManagerInfo(bi); err != nil {
+			return fmt.Errorf("failed to fetch package manager info: %w", err)
 		}
 	}
 

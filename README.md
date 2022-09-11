@@ -55,16 +55,23 @@ The `.ci-info.json` looks like this:
   "version_input_tag": {
     "pattern": "^v?([0-9.]+)$"
   },
-  "template": {
+  "version_input_env_var": {
+    "env_var": "VERSION",
+    "pattern": "^([0-9.]+)$"
+  },
+  "templates": [{
     "input_file": "build.go.tpl",
     "output_file": "build.go"
-  },
+  }, {
+    "input_content": "{{ .Version }}",
+    "output_file": "version.txt"
+  }],
   "build_info_file": "build.json"
 }
 ```
 ## Possible template arguments
-| Argument | Sample | Description |
-| -------- | ------ | ----------- |
+| Argument | Sample value | Description |
+| -------- | ------------ | ----------- |
 | `{{ .Version }}` | `0.1.0-fix-pr-check-f96a756` | The automatically generated version. This is mix of the declared one and the current GIT info. |
 | `{{ .CommitHash }}` | `f96a75638b0e1767f969e23f383f4bc75c0e6ba0` | The current GIT commit |
 | `{{ .CommitHashShort }}` | `f96a756` | Short version of a hash |
@@ -78,6 +85,9 @@ The `.ci-info.json` looks like this:
 | `{{ .BuildDate }}` | `2022-04-23-2210` | The build time |
 | `{{ .BuildHost }}` | `build-server` | The build host |
 | `{{ .BuildUser }}` | `runner` | The build user |
+| `{{ .CISolution }}` | `circleci` | The CI solution |
+| `{{ .CIBuildNumber }}` | `123` | The CI build number |
+| `{{ .PackageManager }}` | `npm` | The package manager |
 
 # Run it
 ## With a local binary

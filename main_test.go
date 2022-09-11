@@ -56,6 +56,14 @@ func TestRunOutputBuildInfoFile(t *testing.T) {
 	a.FileExists(outputFIle)
 }
 
+func TestRunMaven(t *testing.T) {
+	a := assert.New(t)
+
+	a.NoError(os.Chdir("testdata/maven"))
+
+	a.NoError(runMain([]string{}))
+}
+
 func TestRunStandardOne(t *testing.T) {
 	a := assert.New(t)
 

@@ -98,21 +98,46 @@
             },
             "additionalProperties": false
         },
+        "version_input_env_var": {
+            "$id": "/properties/version_input_env_var",
+            "type": "object",
+            "title": "Tag version input environment variable",
+            "default": {},
+            "examples": [
+                {
+                    "name": "VERSION",
+                    "pattern": "^([0-9.]+)$"
+                }
+            ],
+            "required": [
+                "name",
+                "pattern"
+            ],
+            "properties": {
+                "name": {
+                    "$id": "/properties/version_input_env_var/properties/name",
+                    "type": "string",
+                    "title": "Name of the environment variable to use",
+                    "examples": [
+                        "VERSION"
+                    ]
+                },
+                "pattern": {
+                    "$id": "/properties/version_input_env_var/properties/pattern",
+                    "type": "string",
+                    "title": "The pattern to extract from the tag",
+                    "examples": [
+                        "^([0-9.]+)$"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
         "templates": {
             "$id": "/properties/templates",
             "type": "array",
             "title": "Templates to apply",
             "default": [],
-            "examples": [
-                {
-                    "templates": [
-                        {
-                            "input_file": "build.go.tpl",
-                            "output_file": "build.go"
-                        }
-                    ]
-                }
-            ],
             "items": {
                 "$id": "/properties/templates/template",
                 "type": "object",

@@ -9,7 +9,7 @@ import (
 	log "github.com/inconshreveable/log15"
 )
 
-var errNoInfoFound = fmt.Errorf("no info found (are you in a git repo ?)")
+var errNoGITInfoFound = fmt.Errorf("no info found (are you in a git repo ?)")
 
 func generateBuildInfo(config *Config) (*BuildInfo, error) {
 	var err error
@@ -22,19 +22,13 @@ func generateBuildInfo(config *Config) (*BuildInfo, error) {
 	}
 
 	// We get the CI info from the current CI environment
-	if err = fetchCIInfo(buildInfo); err != nil {
+	if err = fetchCISolutionInfo(buildInfo); err != nil {
 		return nil, fmt.Errorf("failed to fetch CI info: %w", err)
 	}
 
 	// If GIT isn't disabled, we fetch the missing information using git commands
-	if config.GitCmdMode {
-		if err = fetchGitInfoWithCmd(buildInfo); err != nil {
-			return nil, fmt.Errorf("failed to fetch git info: %w", err)
-		}
-	} else {
-		if err = fetchGitInfoNative(buildInfo); err != nil {
-			return nil, fmt.Errorf("failed to fetch git info: %w", err)
-		}
+	if err = fetchGitInfo(buildInfo, config.GitCmdMode); err != nil {
+		return nil, fmt.Errorf("failed to fetch git info: %w", err)
 	}
 
 	// We fill the buildInfo struct with some information built from other parts of the struct
@@ -154,7 +148,7 @@ func runMain(args []string) error {
 	}
 
 	if buildInfo.CommitHash == "" {
-		return errNoInfoFound
+		return errNoGITInfoFound
 	}
 
 	log.Info("Fetched build info", "buildInfo", buildInfo)

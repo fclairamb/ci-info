@@ -1,0 +1,4 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fclairamb/ci-info/main/config-schema.json",
+  "build_info_file": "build.json"
+}

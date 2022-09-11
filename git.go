@@ -101,6 +101,14 @@ func fetchGitInfoNative(info *BuildInfo) error {
 	return nil
 }
 
+func fetchGitInfo(info *BuildInfo, cmd bool) error {
+	if cmd {
+		return fetchGitInfoWithCmd(info)
+	}
+
+	return fetchGitInfoNative(info)
+}
+
 func fetchGitInfoWithCmd(info *BuildInfo) error {
 	type gitInfoFetch struct {
 		info    *string
