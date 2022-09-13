@@ -1,5 +1,13 @@
 # CI Info
 
+[![Go version](https://img.shields.io/github/go-mod/go-version/fclairamb/ci-info)](https://golang.org/doc/devel/release.html)
+[![Release](https://img.shields.io/github/v/release/fclairamb/ci-info)](https://github.com/fclairamb/ci-info/releases/latest)
+[![Build](https://github.com/fclairamb/ci-info/workflows/Build/badge.svg)](https://github.com/fclairamb/ci-info/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/fclairamb/ci-info/branch/main/graph/badge.svg?token=Ajv8lfWGJy)](https://codecov.io/gh/fclairamb/ci-info)<!--- [![gocover.io](https://gocover.io/_badge/github.com/fclairamb/ci-info)](https://gocover.io/github.com/fclairamb/ci-info) -->
+[![Go Report Card](https://goreportcard.com/badge/fclairamb/ci-info)](https://goreportcard.com/report/fclairamb/ci-info)
+[![GoDoc](https://godoc.org/github.com/fclairamb/ci-info?status.svg)](https://godoc.org/github.com/fclairamb/ci-info)
+
+
 This tool helps extract CI info and embed them in a resulting code (whether it's compiled or not).
 
 ## Why
