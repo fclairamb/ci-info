@@ -78,7 +78,7 @@ func (bi *BuildInfo) complete() error {
 	}
 
 	if bi.BuildDate == "" {
-		bi.BuildDate = time.Now().UTC().Format(timeFormat)
+		bi.BuildDate = time.Now().UTC().Format(time.RFC3339)
 	}
 
 	return nil

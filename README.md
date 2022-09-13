@@ -1,8 +1,7 @@
 # CI Info
 
-This tool helps extract CI info.
+This tool helps extract CI info and embed them in a resulting code (whether it's compiled or not).
 
-Version: 0.1.0
 ## Why
 Adding the CI info useful to identify what was used to build any app. Yet, doing it properly is boring.
 
