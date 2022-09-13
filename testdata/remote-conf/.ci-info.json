@@ -1,0 +1,7 @@
+{
+    "$schema": "../../config-schema.json",
+    "templates": [{
+        "input_file": "something",
+        "output_file": "something else"
+    }]
+}

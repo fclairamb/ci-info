@@ -1,0 +1,14 @@
+{
+    "$schema": "../../config-schema.json",
+    "version_input_file": {
+        "file": "package.json",
+        "pattern": "\"version\" *: *\"([0-9.]+)\""
+    },
+    "build_info_file": "build.json",
+    "templates": [
+        {
+            "input_content": "{{ .Version }}",
+            "output_file": "version.txt"
+        }
+    ]
+}

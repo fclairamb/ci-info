@@ -66,10 +66,10 @@ func TestSave(t *testing.T) {
 func TestReadme(t *testing.T) {
 	a := require.New(t)
 	config := &Config{
-		Template: ConfigTemplate{
+		Templates: []*ConfigTemplate{{
 			InputFile:  "README.md",
 			OutputFile: "/tmp/README.md",
-		},
+		}},
 		InputVersionFile: ConfigVersionInputFile{
 			File:    "README.md",
 			Pattern: "Version: ([0-9+\\.]+)",

@@ -27,6 +27,9 @@ type BuildInfo struct {
 	BuildDate         string `json:"build_date,omitempty"`
 	BuildHost         string `json:"build_host,omitempty"`
 	BuildUser         string `json:"build_user,omitempty"`
+	CISolution        string `json:"ci_solution,omitempty"`
+	CIBuildNumber     string `json:"ci_build_number,omitempty"`
+	PackageManager    string `json:"package_manager,omitempty"`
 }
 
 var reBranchClean = regexp.MustCompile(`[^a-zA-Z0-9_\-]+`)
@@ -94,7 +97,14 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 	var envVersion, tagVersion, fileVersion string
 	var err error
 
-	envVersion = os.Getenv("VERSION")
+	if config.InputVersionEnvVar.EnvVar != "" {
+		if envVarValue, ok := os.LookupEnv(config.InputVersionEnvVar.EnvVar); ok {
+			envVersion, err = getVersionFromContent(envVarValue, config.InputVersionEnvVar.Pattern)
+			if err != nil {
+				return fmt.Errorf("could not get version from env var %s: %w", config.InputVersionEnvVar.EnvVar, err)
+			}
+		}
+	}
 
 	if bi.CommitTag != "" && config.InputVersionTag.Pattern != "" {
 		if tagVersion, err = getVersionFromContent(bi.CommitTag, config.InputVersionTag.Pattern); err != nil {
@@ -102,8 +112,16 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 		}
 	}
 
-	if fileVersion, err = getVersionFromFile(config.InputVersionFile.File, config.InputVersionFile.Pattern); err != nil {
-		return fmt.Errorf("failed to get version from file: %w", err)
+	if config.InputVersionFile.File != "" {
+		if fileVersion, err = getVersionFromFile(config.InputVersionFile.File, config.InputVersionFile.Pattern); err != nil {
+			return fmt.Errorf("failed to get version from file: %w", err)
+		}
+	}
+
+	if fileVersion == "" {
+		if err = fetchPackageManagerInfo(config.Directory, bi); err != nil {
+			return fmt.Errorf("failed to fetch package manager info: %w", err)
+		}
 	}
 
 	switch {
@@ -116,6 +134,10 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 	case fileVersion != "":
 		bi.VersionDeclared = fileVersion
 		bi.Version = fileVersion + "-" + bi.CommitSmart
+	default:
+		if bi.VersionDeclared != "" {
+			bi.Version = bi.VersionDeclared + "-" + bi.CommitSmart
+		}
 	}
 
 	return nil

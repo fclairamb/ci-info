@@ -6,10 +6,31 @@ Version: 0.1.0
 ## Why
 Adding the CI info useful to identify what was used to build any app. Yet, doing it properly is boring.
 
-## How
+## How it works
 You provide a template file and it will take care of writing the final file with the build information.
 
 This makes it completely language-agnostic.
+
+## Very basic usage
+You can also completely skip the templating system:
+```zsh
+% ci-info -b build.json -vf version.txt
+
+% cat build.json  
+{
+  "ci_info_version": "0.1.0-feature-config-change-6ea1772",
+  "version": "0.1.0-feature-config-change-6ea1772",
+  "git_hash": "6ea17722aa995a6c69c67e833d3c5abee463f7da",
+  "git_date": "2022-09-10 22:51:17 +0200",
+  "git_branch": "feature/config-change",
+  "build_date": "2022-09-10-2126",
+  "build_host": "MBPdeFlorent2",
+  "build_user": "florent"
+}
+
+% cat version.txt
+0.1.0-feature-config-change-6ea1772
+```
 
 ## Supported CI
 
@@ -34,16 +55,23 @@ The `.ci-info.json` looks like this:
   "version_input_tag": {
     "pattern": "^v?([0-9.]+)$"
   },
-  "template": {
+  "version_input_env_var": {
+    "env_var": "VERSION",
+    "pattern": "^([0-9.]+)$"
+  },
+  "templates": [{
     "input_file": "build.go.tpl",
     "output_file": "build.go"
-  },
+  }, {
+    "input_content": "{{ .Version }}",
+    "output_file": "version.txt"
+  }],
   "build_info_file": "build.json"
 }
 ```
 ## Possible template arguments
-| Argument | Sample | Description |
-| -------- | ------ | ----------- |
+| Argument | Sample value | Description |
+| -------- | ------------ | ----------- |
 | `{{ .Version }}` | `0.1.0-fix-pr-check-f96a756` | The automatically generated version. This is mix of the declared one and the current GIT info. |
 | `{{ .CommitHash }}` | `f96a75638b0e1767f969e23f383f4bc75c0e6ba0` | The current GIT commit |
 | `{{ .CommitHashShort }}` | `f96a756` | Short version of a hash |
@@ -57,6 +85,9 @@ The `.ci-info.json` looks like this:
 | `{{ .BuildDate }}` | `2022-04-23-2210` | The build time |
 | `{{ .BuildHost }}` | `build-server` | The build host |
 | `{{ .BuildUser }}` | `runner` | The build user |
+| `{{ .CISolution }}` | `circleci` | The CI solution |
+| `{{ .CIBuildNumber }}` | `123` | The CI build number |
+| `{{ .PackageManager }}` | `npm` | The package manager |
 
 # Run it
 ## With a local binary

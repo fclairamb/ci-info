@@ -6,10 +6,10 @@
   "version_input_tag": {
     "pattern": "^v?([0-9.]+)$"
   },
-  "template": {
+  "templates": [{
     "input_file": "version.c.tpl",
     "output_file": "version.c"
-  },
+  }],
   "build_info_file": "build.json",
-  "disabled_git_cmd": true
+  "git_cmd_mode": true
 }
