@@ -14,18 +14,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Docker meta
+      - name: Docker meta (scratch)
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v4
         with:
           images: fclairamb/ci-info
-      - name: Docker meta
+      - name: Docker meta (alpine)
         id: docker_meta_alpine
         uses: crazy-max/ghaction-docker-meta@v4
         with:
           images: fclairamb/ci-info
           flavor: |
-            suffix=alpine
+            suffix=-alpine
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
