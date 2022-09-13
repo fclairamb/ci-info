@@ -14,21 +14,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Prepare build info
-        id: build-info
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Build & executed
         run: |
-          echo '{
-            "version_input_git_tag": {
-              "pattern": "^v?([0-9.]+)$"
-            },
-            "templates": [
-              {
-                "input_file": "build.go.tpl",
-                "output_file": "build.go"
-              }
-            ]
-          }' > .ci-info.json
-          curl -L https://github.com/fclairamb/ci-info/releases/download/v0.3.0/ci-info_0.3.0_linux_amd64.tar.gz | tar -xz
+          go build -v ./...
           ./ci-info
       - name: Docker meta (scratch)
         id: docker_meta
