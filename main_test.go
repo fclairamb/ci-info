@@ -11,7 +11,7 @@ func TestRemoteConfig(t *testing.T) {
 	a := assert.New(t)
 
 	params, err := getParams([]string{
-		"-c", "https://raw.githubusercontent.com/fclairamb/ci-info/main/testdata/c/.ci-info.json",
+		"-c", "https://raw.githubusercontent.com/fclairamb/ci-info/main/samples/c/.ci-info.json",
 	})
 	a.NoError(err)
 	a.NotNil(params)
