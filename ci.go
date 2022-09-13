@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -35,23 +36,23 @@ var packageManagerFetchers = []CIInfoFetcher{
 	&nugetInfoFetcher{},
 }
 
-func fetchCISolutionInfo(bi *BuildInfo) error {
-	return fetchCIInfo(bi, ciSolutionsFetchers, &bi.CISolution)
+func fetchCISolutionInfo(dir string, bi *BuildInfo) error {
+	return fetchCIInfo(dir, bi, ciSolutionsFetchers, &bi.CISolution)
 }
 
-func fetchPackageManagerInfo(bi *BuildInfo) error {
-	return fetchCIInfo(bi, packageManagerFetchers, &bi.PackageManager)
+func fetchPackageManagerInfo(dir string, bi *BuildInfo) error {
+	return fetchCIInfo(dir, bi, packageManagerFetchers, &bi.PackageManager)
 }
 
-func fetchCIInfo(bi *BuildInfo, fetchers []CIInfoFetcher, target *string) error {
+func fetchCIInfo(dir string, bi *BuildInfo, fetchers []CIInfoFetcher, target *string) error {
 	for _, fetcher := range fetchers {
-		if !fetcher.Detect() {
+		if !fetcher.Detect(dir) {
 			continue
 		}
 
 		log.Info("Found CI info fetcher", "fetcher", fetcher.String())
 
-		if err := fetcher.Fetch(bi); err != nil {
+		if err := fetcher.Fetch(dir, bi); err != nil {
 			return fmt.Errorf("failed to fetch CI info: %w", err)
 		}
 
@@ -65,9 +66,9 @@ func fetchCIInfo(bi *BuildInfo, fetchers []CIInfoFetcher, target *string) error 
 
 // CIInfoFetcher describes how we shall fetch information
 type CIInfoFetcher interface {
-	Detect() bool              // Detect if it's a suited fetcher
-	Fetch(bi *BuildInfo) error // Fetch
-	String() string            // Name of the fetcher
+	Detect(dir string) bool                // Detect if it's a suited fetcher
+	Fetch(dir string, bi *BuildInfo) error // Fetch
+	String() string                        // Name of the fetcher
 }
 
 // circleCIInfoFetcher is a fetcher for CircleCI
@@ -75,12 +76,12 @@ type CIInfoFetcher interface {
 type circleCIInfoFetcher struct{}
 
 // Detect if it's a suited fetcher
-func (c circleCIInfoFetcher) Detect() bool {
+func (c circleCIInfoFetcher) Detect(_ string) bool {
 	return os.Getenv("CIRCLECI") == sTrue
 }
 
 // Fetch fetches the CI information
-func (c circleCIInfoFetcher) Fetch(bi *BuildInfo) error {
+func (c circleCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
 	bi.CommitHash = os.Getenv("CIRCLE_SHA1")
 	bi.CommitTag = os.Getenv("CIRCLE_TAG")
 	bi.CommitBranch = os.Getenv("CIRCLE_BRANCH")
@@ -98,12 +99,12 @@ func (c circleCIInfoFetcher) String() string {
 type githubActionsCIInfoFetcher struct{}
 
 // Detect if it's a suited fetcher
-func (f githubActionsCIInfoFetcher) Detect() bool {
+func (f githubActionsCIInfoFetcher) Detect(_ string) bool {
 	return os.Getenv("GITHUB_ACTION") != ""
 }
 
 // Fetch fetches the CI information
-func (f githubActionsCIInfoFetcher) Fetch(bi *BuildInfo) error {
+func (f githubActionsCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
 	bi.CommitHash = os.Getenv("GITHUB_SHA")
 	bi.CIBuildNumber = os.Getenv("GITHUB_RUN_ID")
 	ref := os.Getenv("GITHUB_REF")
@@ -126,12 +127,12 @@ func (f githubActionsCIInfoFetcher) String() string {
 type travisCIInfoFetcher struct{}
 
 // Detect if it's a suited fetcher
-func (t travisCIInfoFetcher) Detect() bool {
+func (t travisCIInfoFetcher) Detect(_ string) bool {
 	return os.Getenv("TRAVIS") == "true"
 }
 
 // Fetch fetches the CI information
-func (t travisCIInfoFetcher) Fetch(bi *BuildInfo) error {
+func (t travisCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
 	bi.CommitHash = os.Getenv("TRAVIS_COMMIT")
 	bi.CommitTag = os.Getenv("TRAVIS_TAG")
 	bi.CommitBranch = os.Getenv("TRAVIS_BRANCH")
@@ -148,12 +149,12 @@ func (t travisCIInfoFetcher) String() string {
 type gitLabInfoFetcher struct{}
 
 // Detect if it's a suited fetcher
-func (f gitLabInfoFetcher) Detect() bool {
+func (f gitLabInfoFetcher) Detect(_ string) bool {
 	return os.Getenv("GITLAB_USER_ID") != ""
 }
 
 // Fetch fetches the CI information
-func (f gitLabInfoFetcher) Fetch(bi *BuildInfo) error {
+func (f gitLabInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
 	bi.CommitHash = os.Getenv("CI_COMMIT_SHA")
 	bi.CommitTag = os.Getenv("CI_COMMIT_TAG")
 	bi.CommitBranch = os.Getenv("CI_COMMIT_REF_NAME")
@@ -171,12 +172,12 @@ func (f gitLabInfoFetcher) String() string {
 type droneCIInfoFetcher struct{}
 
 // Detect if it's a suited fetcher
-func (f droneCIInfoFetcher) Detect() bool {
+func (f droneCIInfoFetcher) Detect(_ string) bool {
 	return os.Getenv("DRONE") == "true"
 }
 
 // Fetch fetches the CI information
-func (f droneCIInfoFetcher) Fetch(bi *BuildInfo) error {
+func (f droneCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
 	bi.CommitHash = os.Getenv("DRONE_COMMIT")
 	bi.CommitTag = os.Getenv("DRONE_TAG")
 	bi.CommitBranch = os.Getenv("DRONE_BRANCH")
@@ -194,12 +195,12 @@ func (f droneCIInfoFetcher) String() string {
 type jenkinsCIInfoFetcher struct{}
 
 // Detect if it's a suited fetcher
-func (f jenkinsCIInfoFetcher) Detect() bool {
+func (f jenkinsCIInfoFetcher) Detect(_ string) bool {
 	return os.Getenv("JENKINS_URL") != ""
 }
 
 // Fetch fetches the CI information
-func (f jenkinsCIInfoFetcher) Fetch(bi *BuildInfo) error {
+func (f jenkinsCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
 	bi.CommitHash = os.Getenv("GIT_COMMIT")
 	bi.CommitTag = os.Getenv("GIT_TAG")
 	bi.CommitBranch = os.Getenv("GIT_BRANCH")
@@ -214,8 +215,8 @@ func (f jenkinsCIInfoFetcher) String() string {
 
 type npmInfoFetcher struct{}
 
-func (f npmInfoFetcher) Detect() bool {
-	st, err := os.Stat("package.json")
+func (f npmInfoFetcher) Detect(dir string) bool {
+	st, err := os.Stat(path.Join(dir, "package.json"))
 	if err != nil {
 		return false
 	}
@@ -224,8 +225,8 @@ func (f npmInfoFetcher) Detect() bool {
 }
 
 // Fetch parses a package.json file and retrieve the version property
-func (f npmInfoFetcher) Fetch(bi *BuildInfo) error {
-	b, err := os.ReadFile("package.json")
+func (f npmInfoFetcher) Fetch(dir string, bi *BuildInfo) error {
+	b, err := os.ReadFile(path.Join(dir, "package.json")) //nolint:gosec
 	if err != nil {
 		return err
 	}
@@ -249,8 +250,8 @@ func (f npmInfoFetcher) String() string {
 
 type gradleInfoFetcher struct{}
 
-func (f gradleInfoFetcher) Detect() bool {
-	st, err := os.Stat("build.gradle")
+func (f gradleInfoFetcher) Detect(dir string) bool {
+	st, err := os.Stat(path.Join(dir, "build.gradle"))
 	if err != nil {
 		return false
 	}
@@ -260,8 +261,8 @@ func (f gradleInfoFetcher) Detect() bool {
 
 // Fetch parses a build.gradle file and retrieve the version property
 // Status: Completely broken logic
-func (f gradleInfoFetcher) Fetch(bi *BuildInfo) error {
-	b, err := os.ReadFile("build.gradle")
+func (f gradleInfoFetcher) Fetch(dir string, bi *BuildInfo) error {
+	b, err := os.ReadFile(path.Join(dir, "build.gradle")) //nolint:gosec
 	if err != nil {
 		return err
 	}
@@ -284,8 +285,8 @@ func (f gradleInfoFetcher) String() string {
 
 type mavenInfoFetcher struct{}
 
-func (f mavenInfoFetcher) Detect() bool {
-	st, err := os.Stat("pom.xml")
+func (f mavenInfoFetcher) Detect(dir string) bool {
+	st, err := os.Stat(path.Join(dir, "pom.xml"))
 	if err != nil {
 		return false
 	}
@@ -295,8 +296,8 @@ func (f mavenInfoFetcher) Detect() bool {
 
 // Fetch parses a pom.xml file and retrieve the version property
 // Status: Should work
-func (f mavenInfoFetcher) Fetch(bi *BuildInfo) error {
-	b, err := os.ReadFile("pom.xml")
+func (f mavenInfoFetcher) Fetch(dir string, bi *BuildInfo) error {
+	b, err := os.ReadFile(path.Join(dir, "pom.xml")) //nolint:gosec
 	if err != nil {
 		return err
 	}
@@ -320,7 +321,7 @@ func (f mavenInfoFetcher) String() string {
 
 type nugetInfoFetcher struct{}
 
-func (f nugetInfoFetcher) Detect() bool {
+func (f nugetInfoFetcher) Detect(_ string) bool {
 	st, err := os.Stat("*.csproj")
 	if err != nil {
 		return false
@@ -331,7 +332,7 @@ func (f nugetInfoFetcher) Detect() bool {
 
 // Fetch parses a *.csproj file and retrieve the version property
 // Status: Should work
-func (f nugetInfoFetcher) Fetch(bi *BuildInfo) error {
+func (f nugetInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
 	files, err := filepath.Glob("*.csproj")
 	if err != nil {
 		return err

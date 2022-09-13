@@ -59,9 +59,17 @@ func TestRunOutputBuildInfoFile(t *testing.T) {
 func TestRunMaven(t *testing.T) {
 	a := assert.New(t)
 
-	a.NoError(os.Chdir("testdata/maven"))
+	a.NoError(runMain([]string{"-c", "testdata/maven/.ci-info.json"}))
+	a.FileExists("testdata/maven/build.json")
+	a.FileExists("testdata/maven/version.txt")
+}
 
-	a.NoError(runMain([]string{}))
+func TestRunNpm(t *testing.T) {
+	a := assert.New(t)
+
+	a.NoError(runMain([]string{"-c", "testdata/npm/.ci-info.json"}))
+	a.FileExists("testdata/npm/build.json")
+	a.FileExists("testdata/npm/version.txt")
 }
 
 func TestRunStandardOne(t *testing.T) {

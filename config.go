@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 
 	log "github.com/inconshreveable/log15"
@@ -49,13 +50,17 @@ const defaultConfigFile = ".ci-info.json"
 
 var regexURL = regexp.MustCompile(`^https?://`)
 
-func loadPathAsContent(path string) ([]byte, error) {
+func loadPathAsContent(path string, dir string) ([]byte, bool, error) {
 	var reader io.ReadCloser
 
+	fetched := false
+
 	if regexURL.MatchString(path) {
+		fetched = true
 		resp, err := http.Get(path) //nolint:gosec
+
 		if err != nil {
-			return nil, err
+			return nil, fetched, err
 		}
 
 		reader = resp.Body
@@ -66,19 +71,25 @@ func loadPathAsContent(path string) ([]byte, error) {
 			}
 		}()
 	} else {
+		if dir != "" {
+			path = filepath.Join(dir, path)
+		}
+
 		file, err := os.Open(path) //nolint:gosec
 		if err != nil {
-			return nil, err
+			return nil, fetched, err
 		}
 
 		reader = file
 	}
 
-	return io.ReadAll(reader)
+	content, err := io.ReadAll(reader)
+
+	return content, fetched, err
 }
 
 func loadConfig(fileName string) (*Config, error) {
-	jsonContent, err := loadPathAsContent(fileName)
+	jsonContent, fetched, err := loadPathAsContent(fileName, "")
 	if err != nil {
 		return nil, err
 	}
@@ -86,11 +97,35 @@ func loadConfig(fileName string) (*Config, error) {
 	config := &Config{}
 	err = json.Unmarshal(jsonContent, config)
 
+	if !fetched && config.Directory == "" {
+		dir := filepath.Dir(fileName)
+		dir, err = filepath.Abs(dir)
+
+		if err != nil {
+			return nil, err
+		}
+
+		config.Directory = dir
+	} else if fetched {
+		config.Directory, err = os.Getwd()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
 	return config, nil
+}
+
+func getEmptyConfig() (*Config, error) {
+	c := &Config{}
+	var err error
+	c.Directory, err = os.Getwd()
+
+	return c, err
 }
 
 func createDefaultConfig() *Config {

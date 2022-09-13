@@ -119,7 +119,7 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 	}
 
 	if fileVersion == "" {
-		if err = fetchPackageManagerInfo(bi); err != nil {
+		if err = fetchPackageManagerInfo(config.Directory, bi); err != nil {
 			return fmt.Errorf("failed to fetch package manager info: %w", err)
 		}
 	}
@@ -134,6 +134,10 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 	case fileVersion != "":
 		bi.VersionDeclared = fileVersion
 		bi.Version = fileVersion + "-" + bi.CommitSmart
+	default:
+		if bi.VersionDeclared != "" {
+			bi.Version = bi.VersionDeclared + "-" + bi.CommitSmart
+		}
 	}
 
 	return nil

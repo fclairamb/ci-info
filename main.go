@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path"
 	"text/template"
 
 	log "github.com/inconshreveable/log15"
@@ -22,7 +23,7 @@ func generateBuildInfo(config *Config) (*BuildInfo, error) {
 	}
 
 	// We get the CI info from the current CI environment
-	if err = fetchCISolutionInfo(buildInfo); err != nil {
+	if err = fetchCISolutionInfo(config.Directory, buildInfo); err != nil {
 		return nil, fmt.Errorf("failed to fetch CI info: %w", err)
 	}
 
@@ -47,7 +48,7 @@ func generateBuildInfo(config *Config) (*BuildInfo, error) {
 func saveOutputFiles(config *Config, buildInfo *BuildInfo) error {
 	// If requested, we export the build info to a json file
 	if config.BuildInfoFile != "" {
-		if err := buildInfo.save(config.BuildInfoFile); err != nil {
+		if err := buildInfo.save(path.Join(config.Directory, config.BuildInfoFile)); err != nil {
 			return fmt.Errorf("failed to save build info: %w", err)
 		}
 	}
@@ -60,14 +61,14 @@ func saveOutputFiles(config *Config, buildInfo *BuildInfo) error {
 			if template.InputContent != "" {
 				templateString = template.InputContent
 			} else {
-				content, err := loadPathAsContent(template.InputFile)
+				content, _, err := loadPathAsContent(template.InputFile, config.Directory)
 				if err != nil {
 					return fmt.Errorf("failed to load template file from %s: %w", template.InputFile, err)
 				}
 				templateString = string(content)
 			}
 
-			if err := applyTemplate(templateString, template.OutputFile, buildInfo); err != nil {
+			if err := applyTemplate(templateString, path.Join(config.Directory, template.OutputFile), buildInfo); err != nil {
 				return fmt.Errorf("failed to apply template: %w", err)
 			}
 		}
@@ -122,7 +123,9 @@ func runMain(args []string) error {
 			return fmt.Errorf("failed to load config from \"%s\": %w", params.ConfigFile, err)
 		}
 	} else {
-		config = &Config{}
+		if config, err = getEmptyConfig(); err != nil {
+			return fmt.Errorf("failed to get empty config: %w", err)
+		}
 	}
 
 	if params.OutputVersionFile != "" {
