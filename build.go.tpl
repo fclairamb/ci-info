@@ -1,6 +1,6 @@
 package main
 
-const (
+var (
 	// BuildVersion is the current version of the program
 	BuildVersion = "{{ .Version }}"
 
