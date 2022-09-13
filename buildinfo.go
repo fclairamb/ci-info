@@ -94,7 +94,7 @@ func (bi *BuildInfo) save(fileName string) error {
 	return os.WriteFile(fileName, content, 0600)
 }
 
-func (bi *BuildInfo) loadVersion(config *Config) error {
+func (bi *BuildInfo) loadVersion(config *Config) error { //nolint:gocyclo
 	var envVersion, tagVersion, fileVersion, lastTagVersion string
 	var err error
 

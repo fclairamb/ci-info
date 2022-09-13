@@ -50,7 +50,7 @@ func getHead() (*git.Repository, *plumbing.Reference, error) {
 	return repo, ref, nil
 }
 
-func fetchGitInfo(info *BuildInfo) error {
+func fetchGitInfo(info *BuildInfo) error { //nolint:gocyclo
 	// If we have everything, we don't need to fetch anything
 	if info.GitCommitHash != "" && info.GitCommitDate != "" && (info.GitBranch != "" || info.GitTag != "") {
 		return nil
