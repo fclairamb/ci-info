@@ -1,5 +1,6 @@
 ci-info
 build.json
+build.go
 version.txt
 __debug_bin
 tmp/
