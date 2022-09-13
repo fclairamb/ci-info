@@ -112,8 +112,8 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 	}
 
 	if fileVersion == "" {
-		if err = fetchPackageManagerInfo(buildInfo); err != nil {
-			return nil, fmt.Errorf("failed to fetch package manager info: %w", err)
+		if err = fetchPackageManagerInfo(bi); err != nil {
+			return fmt.Errorf("failed to fetch package manager info: %w", err)
 		}
 	}
 

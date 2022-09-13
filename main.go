@@ -22,7 +22,7 @@ func generateBuildInfo(config *Config) (*BuildInfo, error) {
 	}
 
 	// We get the CI info from the current CI environment
-	if err = fetchCIInfo(buildInfo); err != nil {
+	if err = fetchCISolutionInfo(buildInfo); err != nil {
 		return nil, fmt.Errorf("failed to fetch CI info: %w", err)
 	}
 

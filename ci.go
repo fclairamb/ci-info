@@ -264,8 +264,9 @@ func (f gradleInfoFetcher) Fetch(bi *BuildInfo) error {
 
 	re := regexp.MustCompile(`version\s*=\s*['"](.*)['"]`)
 	matches := re.FindStringSubmatch(string(b))
+
 	if len(matches) != 2 {
-		return fmt.Errorf("unable to find version in build.gradle")
+		return errNoInfoFound
 	}
 
 	bi.VersionDeclared = matches[1]
@@ -298,8 +299,9 @@ func (f mavenInfoFetcher) Fetch(bi *BuildInfo) error {
 
 	re := regexp.MustCompile(`<version>(.*)</version>`)
 	matches := re.FindStringSubmatch(string(b))
+
 	if len(matches) != 2 {
-		return fmt.Errorf("unable to find version in pom.xml")
+		return errNoInfoFound
 	}
 
 	bi.VersionDeclared = matches[1]
@@ -331,7 +333,7 @@ func (f nugetInfoFetcher) Fetch(bi *BuildInfo) error {
 	}
 
 	if len(files) == 0 {
-		return fmt.Errorf("unable to find any csproj file")
+		return fmt.Errorf("unable to find any csproj file: %w", errNoInfoFound)
 	}
 
 	b, err := os.ReadFile(files[0])
@@ -343,7 +345,7 @@ func (f nugetInfoFetcher) Fetch(bi *BuildInfo) error {
 	matches := re.FindStringSubmatch(string(b))
 
 	if len(matches) != 2 {
-		return fmt.Errorf("unable to find version in %s", files[0])
+		return fmt.Errorf("unable to find version in %s: %w", files[0], errNoInfoFound)
 	}
 
 	bi.Version = matches[1]
