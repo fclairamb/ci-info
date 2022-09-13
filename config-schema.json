@@ -11,7 +11,7 @@
                 "file": "README.md",
                 "pattern": "Version: ([0-9.]+)\n"
             },
-            "version_input_tag": {
+            "version_input_git_tag": {
                 "pattern": "^v?([0-9.]+)$"
             },
             "template": {
@@ -73,8 +73,8 @@
             },
             "additionalProperties": false
         },
-        "version_input_tag": {
-            "$id": "/properties/version_input_tag",
+        "version_input_git_tag": {
+            "$id": "/properties/version_input_git_tag",
             "type": "object",
             "title": "Tag version input",
             "default": {},
@@ -88,7 +88,7 @@
             ],
             "properties": {
                 "pattern": {
-                    "$id": "/properties/version_input_tag/properties/pattern",
+                    "$id": "/properties/version_input_git_tag/properties/pattern",
                     "type": "string",
                     "title": "The pattern to extract from the tag",
                     "examples": [
@@ -203,15 +203,6 @@
             "title": "The JSON build file",
             "examples": [
                 "build.json"
-            ]
-        },
-        "git_cmd_mode": {
-            "$id": "/properties/git_cmd_mode",
-            "type": "boolean",
-            "title": "GIT with cmd mode",
-            "default": false,
-            "examples": [
-                false
             ]
         },
         "$schema": {

@@ -1,12 +1,12 @@
 package main
 
-const (
+var (
 	// BuildVersion is the current version of the program
-	BuildVersion = "0.1.0-feature-various-improvements-3021755"
+	BuildVersion = "0.3.0-chore-tool-build-info-3d5ba61"
 
 	// BuildDate is the time the program was built
-	BuildDate = "2022-09-13-1326"
+	BuildDate = "2022-09-13T22:27:06Z"
 
 	// Commit is the git hash of the program
-	Commit = "feature-various-improvements-3021755"
+	Commit = "chore-tool-build-info-3d5ba61"
 )

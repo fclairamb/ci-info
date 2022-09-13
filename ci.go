@@ -82,9 +82,9 @@ func (c circleCIInfoFetcher) Detect(_ string) bool {
 
 // Fetch fetches the CI information
 func (c circleCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
-	bi.CommitHash = os.Getenv("CIRCLE_SHA1")
-	bi.CommitTag = os.Getenv("CIRCLE_TAG")
-	bi.CommitBranch = os.Getenv("CIRCLE_BRANCH")
+	bi.GitCommitHash = os.Getenv("CIRCLE_SHA1")
+	bi.GitTag = os.Getenv("CIRCLE_TAG")
+	bi.GitBranch = os.Getenv("CIRCLE_BRANCH")
 	bi.CIBuildNumber = os.Getenv("CIRCLE_BUILD_NUM")
 
 	return nil
@@ -105,14 +105,14 @@ func (f githubActionsCIInfoFetcher) Detect(_ string) bool {
 
 // Fetch fetches the CI information
 func (f githubActionsCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
-	bi.CommitHash = os.Getenv("GITHUB_SHA")
+	bi.GitCommitHash = os.Getenv("GITHUB_SHA")
 	bi.CIBuildNumber = os.Getenv("GITHUB_RUN_ID")
 	ref := os.Getenv("GITHUB_REF")
 
 	if strings.HasPrefix(ref, refBranch) {
-		bi.CommitBranch = ref[len(refBranch):]
+		bi.GitBranch = ref[len(refBranch):]
 	} else if strings.HasPrefix(ref, refTags) {
-		bi.CommitTag = ref[len(refTags):]
+		bi.GitTag = ref[len(refTags):]
 	}
 
 	return nil
@@ -133,9 +133,9 @@ func (t travisCIInfoFetcher) Detect(_ string) bool {
 
 // Fetch fetches the CI information
 func (t travisCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
-	bi.CommitHash = os.Getenv("TRAVIS_COMMIT")
-	bi.CommitTag = os.Getenv("TRAVIS_TAG")
-	bi.CommitBranch = os.Getenv("TRAVIS_BRANCH")
+	bi.GitCommitHash = os.Getenv("TRAVIS_COMMIT")
+	bi.GitTag = os.Getenv("TRAVIS_TAG")
+	bi.GitBranch = os.Getenv("TRAVIS_BRANCH")
 	bi.CIBuildNumber = os.Getenv("TRAVIS_BUILD_NUMBER")
 
 	return nil
@@ -155,9 +155,9 @@ func (f gitLabInfoFetcher) Detect(_ string) bool {
 
 // Fetch fetches the CI information
 func (f gitLabInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
-	bi.CommitHash = os.Getenv("CI_COMMIT_SHA")
-	bi.CommitTag = os.Getenv("CI_COMMIT_TAG")
-	bi.CommitBranch = os.Getenv("CI_COMMIT_REF_NAME")
+	bi.GitCommitHash = os.Getenv("CI_COMMIT_SHA")
+	bi.GitTag = os.Getenv("CI_COMMIT_TAG")
+	bi.GitBranch = os.Getenv("CI_COMMIT_REF_NAME")
 	bi.CIBuildNumber = os.Getenv("CI_PIPELINE_ID")
 
 	return nil
@@ -178,9 +178,9 @@ func (f droneCIInfoFetcher) Detect(_ string) bool {
 
 // Fetch fetches the CI information
 func (f droneCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
-	bi.CommitHash = os.Getenv("DRONE_COMMIT")
-	bi.CommitTag = os.Getenv("DRONE_TAG")
-	bi.CommitBranch = os.Getenv("DRONE_BRANCH")
+	bi.GitCommitHash = os.Getenv("DRONE_COMMIT")
+	bi.GitTag = os.Getenv("DRONE_TAG")
+	bi.GitBranch = os.Getenv("DRONE_BRANCH")
 	bi.CIBuildNumber = os.Getenv("DRONE_BUILD_NUMBER")
 
 	return nil
@@ -201,9 +201,9 @@ func (f jenkinsCIInfoFetcher) Detect(_ string) bool {
 
 // Fetch fetches the CI information
 func (f jenkinsCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
-	bi.CommitHash = os.Getenv("GIT_COMMIT")
-	bi.CommitTag = os.Getenv("GIT_TAG")
-	bi.CommitBranch = os.Getenv("GIT_BRANCH")
+	bi.GitCommitHash = os.Getenv("GIT_COMMIT")
+	bi.GitTag = os.Getenv("GIT_TAG")
+	bi.GitBranch = os.Getenv("GIT_BRANCH")
 	bi.CIBuildNumber = os.Getenv("BUILD_NUMBER")
 
 	return nil

@@ -1,8 +1,15 @@
 # CI Info
 
-This tool helps extract CI info.
+[![Go version](https://img.shields.io/github/go-mod/go-version/fclairamb/ci-info)](https://golang.org/doc/devel/release.html)
+[![Release](https://img.shields.io/github/v/release/fclairamb/ci-info)](https://github.com/fclairamb/ci-info/releases/latest)
+[![Build](https://github.com/fclairamb/ci-info/workflows/Build/badge.svg)](https://github.com/fclairamb/ci-info/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/fclairamb/ci-info/branch/main/graph/badge.svg?token=Ajv8lfWGJy)](https://codecov.io/gh/fclairamb/ci-info)<!--- [![gocover.io](https://gocover.io/_badge/github.com/fclairamb/ci-info)](https://gocover.io/github.com/fclairamb/ci-info) -->
+[![Go Report Card](https://goreportcard.com/badge/fclairamb/ci-info)](https://goreportcard.com/report/fclairamb/ci-info)
+[![GoDoc](https://godoc.org/github.com/fclairamb/ci-info?status.svg)](https://godoc.org/github.com/fclairamb/ci-info)
 
-Version: 0.1.0
+
+This tool helps extract CI info and embed them in a resulting code (whether it's compiled or not).
+
 ## Why
 Adding the CI info useful to identify what was used to build any app. Yet, doing it properly is boring.
 
@@ -43,6 +50,12 @@ The most popular continuous integration services are supported.
 - [Travis CI](https://travis-ci.org/)
 - [Jenkins](https://jenkins.io/)
 
+## Supported package managers
+To extract version information:
+
+- [NPM](https://www.npmjs.com/)
+- [Maven](https://maven.apache.org/)
+
 ## Sample config file
 The `.ci-info.json` looks like this:
 ```json
@@ -73,15 +86,15 @@ The `.ci-info.json` looks like this:
 | Argument | Sample value | Description |
 | -------- | ------------ | ----------- |
 | `{{ .Version }}` | `0.1.0-fix-pr-check-f96a756` | The automatically generated version. This is mix of the declared one and the current GIT info. |
-| `{{ .CommitHash }}` | `f96a75638b0e1767f969e23f383f4bc75c0e6ba0` | The current GIT commit |
-| `{{ .CommitHashShort }}` | `f96a756` | Short version of a hash |
-| `{{ .CommitDate }}` | `2022-04-23 23:52:13 +0200` | The commit's date |
-| `{{ .CommitDateClean }}` | `2022-04-23-2157` | The commit's date in a clean format |
-| `{{ .CommitBranch }}` | `fix/pr-check` | The current branch |
-| `{{ .CommitBranchClean }}` | `fix-pr-check` | The commit branch without special chars |
-| `{{ .CommitTag }}` | `v0.1.0` | The current GIT tag |
-| `{{ .CommitRef }}` | `v0.1.0` | The current GIT tag or branch |
-| `{{ .CommitSmart }}` | `fix-pr-check-f96a756` | The current GIT commit described by tag, otherwise branch + hash, otherwise hash |
+| `{{ .GitCommitHash }}` | `f96a75638b0e1767f969e23f383f4bc75c0e6ba0` | The current GIT commit |
+| `{{ .GitCommitHashShort }}` | `f96a756` | Short version of a hash |
+| `{{ .GitCommitDate }}` | `2022-04-23 23:52:13 +0200` | The commit's date |
+| `{{ .GitCommitDateClean }}` | `2022-04-23-2157` | The commit's date in a clean format |
+| `{{ .GitBranch }}` | `fix/pr-check` | The current branch |
+| `{{ .GitBranchClean }}` | `fix-pr-check` | The commit branch without special chars |
+| `{{ .GitTag }}` | `v0.1.0` | The current GIT tag |
+| `{{ .GitRef }}` | `v0.1.0` | The current GIT tag or branch |
+| `{{ .GitSmartRef }}` | `fix-pr-check-f96a756` | The current GIT commit described by tag, otherwise branch + hash, otherwise hash |
 | `{{ .BuildDate }}` | `2022-04-23-2210` | The build time |
 | `{{ .BuildHost }}` | `build-server` | The build host |
 | `{{ .BuildUser }}` | `runner` | The build user |
@@ -92,11 +105,16 @@ The `.ci-info.json` looks like this:
 # Run it
 ## With a local binary
 ```sh
-curl https://github.com/fclairamb/ci-info/releases/download/v0.1.10/ci-info_0.1.10_darwin_arm64.tar.gz |tar -x
-./ci-info
+curl -L https://github.com/fclairamb/ci-info/releases/download/v0.3.0/ci-info_0.3.0_darwin_arm64.tar.gz | tar -x && ./ci-info
 ```
 
 ## with a container
+From scratch (single binary):
 ```sh
-docker run --rm -ti -v $(pwd):/work fclairamb/ci-info
+docker run --rm -ti -v $(pwd):/work fclairamb/ci-info:v0.3.0
+```
+
+With alpine:
+```sh
+docker run --rm -ti -v $(pwd):/work fclairamb/ci-info:v0.3.0-alpine
 ```

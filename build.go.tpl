@@ -1,6 +1,6 @@
 package main
 
-const (
+var (
 	// BuildVersion is the current version of the program
 	BuildVersion = "{{ .Version }}"
 
@@ -8,5 +8,5 @@ const (
 	BuildDate = "{{ .BuildDate }}"
 
 	// Commit is the git hash of the program
-	Commit = "{{ .CommitSmart }}"
+	Commit = "{{ .GitSmartRef }}"
 )

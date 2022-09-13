@@ -1,15 +1,15 @@
 {
+  "$schema": "../../config-schema.json",
   "version_input_file": {
     "file": "VERSION",
     "pattern": "VERSION = \"([0-9.]+)\"\n"
   },
-  "version_input_tag": {
+  "version_input_git_tag": {
     "pattern": "^v?([0-9.]+)$"
   },
   "templates": [{
     "input_file": "version.c.tpl",
     "output_file": "version.c"
   }],
-  "build_info_file": "build.json",
-  "git_cmd_mode": true
+  "build_info_file": "build.json"
 }

@@ -28,7 +28,7 @@ func generateBuildInfo(config *Config) (*BuildInfo, error) {
 	}
 
 	// If GIT isn't disabled, we fetch the missing information using git commands
-	if err = fetchGitInfo(buildInfo, config.GitCmdMode); err != nil {
+	if err = fetchGitInfo(buildInfo); err != nil {
 		return nil, fmt.Errorf("failed to fetch git info: %w", err)
 	}
 
@@ -69,7 +69,7 @@ func saveOutputFiles(config *Config, buildInfo *BuildInfo) error {
 			}
 
 			if err := applyTemplate(templateString, path.Join(config.Directory, template.OutputFile), buildInfo); err != nil {
-				return fmt.Errorf("failed to apply template: %w", err)
+				return fmt.Errorf("failed to apply template for %s: %w", template.OutputFile, err)
 			}
 		}
 	}
@@ -150,7 +150,7 @@ func runMain(args []string) error {
 		return err
 	}
 
-	if buildInfo.CommitHash == "" {
+	if buildInfo.GitCommitHash == "" {
 		return errNoGITInfoFound
 	}
 

@@ -2,7 +2,7 @@ name: Build docker images
 
 on:
   push:
-    #branches: # At least when doing some tests
+    # branches: # At least when doing some tests
     #  - "**"
     tags:
       - "v*.*.*"
@@ -14,6 +14,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Build & execute
+        run: |
+          go build -v ./...
+          ./ci-info
       - name: Docker meta (scratch)
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v4
