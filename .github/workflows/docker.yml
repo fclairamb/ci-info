@@ -2,8 +2,8 @@ name: Build docker images
 
 on:
   push:
-    # branches: # At least when doing some tests
-    #  - "**"
+    branches: # At least when doing some tests
+      - "**"
     tags:
       - "v*.*.*"
   # pull_request:
@@ -14,11 +14,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Docker meta
+      - name: Docker meta (scratch)
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v4
         with:
           images: fclairamb/ci-info
+      - name: Docker meta (alpine)
+        id: docker_meta_alpine
+        uses: crazy-max/ghaction-docker-meta@v4
+        with:
+          images: fclairamb/ci-info
+          flavor: |
+            suffix=-alpine
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -43,7 +50,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
-      - name: Build and push
+      - name: Build and push (scratch)
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -52,5 +59,16 @@ jobs:
           push: ${{ github.repository == 'fclairamb/ci-info' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+      - name: Build and push (alpine)
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile.alpine
+          platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
+          push: ${{ github.repository == 'fclairamb/ci-info' }}
+          tags: ${{ steps.docker_meta_alpine.outputs.tags }}
+          labels: ${{ steps.docker_meta_alpine.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
