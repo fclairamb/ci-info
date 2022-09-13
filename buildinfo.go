@@ -12,24 +12,25 @@ import (
 
 // BuildInfo contains all the information about the build
 type BuildInfo struct {
-	CIInfoVersion     string `json:"ci_info_version"`
-	VersionDeclared   string `json:"-"`
-	Version           string `json:"version,omitempty"`
-	CommitHash        string `json:"git_hash,omitempty"`
-	CommitHashShort   string `json:"-"`
-	CommitDate        string `json:"git_date,omitempty"`
-	CommitDateClean   string `json:"-"`
-	CommitBranch      string `json:"git_branch,omitempty"`
-	CommitBranchClean string `json:"-"`
-	CommitTag         string `json:"git_tag,omitempty"`
-	CommitRef         string `json:"-"`
-	CommitSmart       string `json:"-"`
-	BuildDate         string `json:"build_date,omitempty"`
-	BuildHost         string `json:"build_host,omitempty"`
-	BuildUser         string `json:"build_user,omitempty"`
-	CISolution        string `json:"ci_solution,omitempty"`
-	CIBuildNumber     string `json:"ci_build_number,omitempty"`
-	PackageManager    string `json:"package_manager,omitempty"`
+	CIInfoVersion      string `json:"ci_info_version"`
+	VersionDeclared    string `json:"-"`
+	Version            string `json:"version,omitempty"`
+	GitCommitHash      string `json:"git_hash,omitempty"`
+	GitCommitHashShort string `json:"-"`
+	GitCommitDate      string `json:"git_date,omitempty"`
+	GitCommitDateClean string `json:"-"`
+	GitBranch          string `json:"git_branch,omitempty"`
+	GitBranchClean     string `json:"-"`
+	GitTag             string `json:"git_tag,omitempty"`
+	GitRef             string `json:"-"`
+	GitSmartRef        string `json:"-"`
+	GitLastTag         string `json:"-"`
+	BuildDate          string `json:"build_date,omitempty"`
+	BuildHost          string `json:"build_host,omitempty"`
+	BuildUser          string `json:"build_user,omitempty"`
+	CISolution         string `json:"ci_solution,omitempty"`
+	CIBuildNumber      string `json:"ci_build_number,omitempty"`
+	PackageManager     string `json:"package_manager,omitempty"`
 }
 
 var reBranchClean = regexp.MustCompile(`[^a-zA-Z0-9_\-]+`)
@@ -37,32 +38,32 @@ var reBranchClean = regexp.MustCompile(`[^a-zA-Z0-9_\-]+`)
 const timeFormat = "2006-01-02-1504"
 
 func (bi *BuildInfo) complete() error {
-	if bi.CommitHash != "" {
-		bi.CommitHashShort = bi.CommitHash[:7]
+	if bi.GitCommitHash != "" {
+		bi.GitCommitHashShort = bi.GitCommitHash[:7]
 	}
 
-	if bi.CommitDate != "" {
-		date, err := time.Parse("2006-01-02 15:04:05 -0700", bi.CommitDate)
+	if bi.GitCommitDate != "" {
+		date, err := time.Parse("2006-01-02 15:04:05 -0700", bi.GitCommitDate)
 		if err != nil {
 			return fmt.Errorf("could not parse commit date: %w", err)
 		}
 
-		bi.CommitDateClean = date.UTC().Format(timeFormat)
+		bi.GitCommitDateClean = date.UTC().Format(timeFormat)
 	}
 
-	if bi.CommitBranch != "" {
-		bi.CommitBranchClean = reBranchClean.ReplaceAllString(bi.CommitBranch, "-")
+	if bi.GitBranch != "" {
+		bi.GitBranchClean = reBranchClean.ReplaceAllString(bi.GitBranch, "-")
 	}
 
 	switch {
-	case bi.CommitTag != "":
-		bi.CommitRef = bi.CommitTag
-		bi.CommitSmart = bi.CommitTag
-	case bi.CommitBranchClean != "":
-		bi.CommitRef = bi.CommitBranchClean
-		bi.CommitSmart = bi.CommitBranchClean + "-" + bi.CommitHashShort
+	case bi.GitTag != "":
+		bi.GitRef = bi.GitTag
+		bi.GitSmartRef = bi.GitTag
+	case bi.GitBranchClean != "":
+		bi.GitRef = bi.GitBranchClean
+		bi.GitSmartRef = bi.GitBranchClean + "-" + bi.GitCommitHashShort
 	default:
-		bi.CommitSmart = bi.CommitHashShort
+		bi.GitSmartRef = bi.GitCommitHashShort
 	}
 
 	if bi.BuildHost == "" {
@@ -94,7 +95,7 @@ func (bi *BuildInfo) save(fileName string) error {
 }
 
 func (bi *BuildInfo) loadVersion(config *Config) error {
-	var envVersion, tagVersion, fileVersion string
+	var envVersion, tagVersion, fileVersion, lastTagVersion string
 	var err error
 
 	if config.InputVersionEnvVar.EnvVar != "" {
@@ -106,9 +107,17 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 		}
 	}
 
-	if bi.CommitTag != "" && config.InputVersionTag.Pattern != "" {
-		if tagVersion, err = getVersionFromContent(bi.CommitTag, config.InputVersionTag.Pattern); err != nil {
-			return fmt.Errorf("failed to get version from tag: %w", err)
+	if config.InputVersionTag.Pattern != "" {
+		if bi.GitTag != "" {
+			if tagVersion, err = getVersionFromContent(bi.GitTag, config.InputVersionTag.Pattern); err != nil {
+				return fmt.Errorf("failed to get version from tag: %w", err)
+			}
+		}
+
+		if bi.GitLastTag != "" {
+			if lastTagVersion, err = getVersionFromContent(bi.GitLastTag, config.InputVersionTag.Pattern); err != nil {
+				return fmt.Errorf("failed to get version from last tag: %w", err)
+			}
 		}
 	}
 
@@ -133,10 +142,12 @@ func (bi *BuildInfo) loadVersion(config *Config) error {
 		bi.Version = tagVersion
 	case fileVersion != "":
 		bi.VersionDeclared = fileVersion
-		bi.Version = fileVersion + "-" + bi.CommitSmart
+		bi.Version = fileVersion + "-" + bi.GitSmartRef
+	case lastTagVersion != "":
+		bi.Version = lastTagVersion + "-" + bi.GitSmartRef
 	default:
 		if bi.VersionDeclared != "" {
-			bi.Version = bi.VersionDeclared + "-" + bi.CommitSmart
+			bi.Version = bi.VersionDeclared + "-" + bi.GitSmartRef
 		}
 	}
 

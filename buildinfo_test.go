@@ -9,36 +9,36 @@ import (
 func TestDate(t *testing.T) {
 	a := require.New(t)
 	bi := &BuildInfo{
-		CommitDate: "2022-04-21 11:52:09 +0200",
+		GitCommitDate: "2022-04-21 11:52:09 +0200",
 	}
 	a.Nil(bi.complete())
-	a.Equal("2022-04-21-0952", bi.CommitDateClean)
+	a.Equal("2022-04-21-0952", bi.GitCommitDateClean)
 }
 
 func TestTagOrBranch(t *testing.T) {
 	a := require.New(t)
 	bi := &BuildInfo{
-		CommitBranch: "feature/cool-one",
-		CommitHash:   "a6850c90c8d3c81377cee5701f79dfbbd6e5a756",
+		GitBranch:     "feature/cool-one",
+		GitCommitHash: "a6850c90c8d3c81377cee5701f79dfbbd6e5a756",
 	}
 	a.Nil(bi.complete())
-	a.Equal("feature-cool-one", bi.CommitRef)
-	a.Equal("feature-cool-one-a6850c9", bi.CommitSmart)
+	a.Equal("feature-cool-one", bi.GitRef)
+	a.Equal("feature-cool-one-a6850c9", bi.GitSmartRef)
 
-	bi.CommitTag = "v1.2.3"
+	bi.GitTag = "v1.2.3"
 	a.Nil(bi.complete())
-	a.Equal("v1.2.3", bi.CommitRef)
-	a.Equal("v1.2.3", bi.CommitSmart)
+	a.Equal("v1.2.3", bi.GitRef)
+	a.Equal("v1.2.3", bi.GitSmartRef)
 }
 
 func TestHash(t *testing.T) {
 	a := require.New(t)
 	bi := &BuildInfo{
-		CommitHash: "a6850c90c8d3c81377cee5701f79dfbbd6e5a756",
+		GitCommitHash: "a6850c90c8d3c81377cee5701f79dfbbd6e5a756",
 	}
 	a.Nil(bi.complete())
-	a.Equal("a6850c9", bi.CommitHashShort)
-	a.Equal("a6850c9", bi.CommitSmart)
+	a.Equal("a6850c9", bi.GitCommitHashShort)
+	a.Equal("a6850c9", bi.GitSmartRef)
 }
 
 func TestVersionAuto(t *testing.T) {
@@ -54,9 +54,9 @@ func TestSave(t *testing.T) {
 	a := require.New(t)
 	bi := &BuildInfo{
 		VersionDeclared: "1.2.3",
-		CommitHash:      "a6850c90c8d3c81377cee5701f79dfbbd6e5a756",
-		CommitDate:      "2022-04-21 11:52:09 +0200",
-		CommitBranch:    "main",
+		GitCommitHash:   "a6850c90c8d3c81377cee5701f79dfbbd6e5a756",
+		GitCommitDate:   "2022-04-21 11:52:09 +0200",
+		GitBranch:       "main",
 	}
 	a.Nil(bi.complete())
 	a.Nil(bi.save("/tmp/buildinfo.json"))
@@ -71,7 +71,7 @@ func TestReadme(t *testing.T) {
 			OutputFile: "/tmp/README.md",
 		}},
 		InputVersionFile: ConfigVersionInputFile{
-			File:    "README.md",
+			File:    "testdata/README.md",
 			Pattern: "Version: ([0-9+\\.]+)",
 		},
 	}

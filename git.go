@@ -2,13 +2,11 @@ package main
 
 import (
 	"os"
-	"os/exec"
 	"path"
-	"strings"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	log "github.com/inconshreveable/log15"
+	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 // var repo *git.Repository
@@ -52,9 +50,9 @@ func getHead() (*git.Repository, *plumbing.Reference, error) {
 	return repo, ref, nil
 }
 
-func fetchGitInfoNative(info *BuildInfo) error {
+func fetchGitInfo(info *BuildInfo) error {
 	// If we have everything, we don't need to fetch anything
-	if info.CommitHash != "" && info.CommitDate != "" && (info.CommitBranch != "" || info.CommitTag != "") {
+	if info.GitCommitHash != "" && info.GitCommitDate != "" && (info.GitBranch != "" || info.GitTag != "") {
 		return nil
 	}
 
@@ -63,24 +61,24 @@ func fetchGitInfoNative(info *BuildInfo) error {
 		return err
 	}
 
-	if info.CommitHash == "" {
-		info.CommitHash = ref.Hash().String()
+	if info.GitCommitHash == "" {
+		info.GitCommitHash = ref.Hash().String()
 	}
 
-	if info.CommitBranch == "" {
-		info.CommitBranch = ref.Name().Short()
+	if info.GitBranch == "" {
+		info.GitBranch = ref.Name().Short()
 	}
 
-	if info.CommitDate == "" {
+	if info.GitCommitDate == "" {
 		commit, err := repo.CommitObject(ref.Hash())
 		if err != nil {
 			return err
 		}
 
-		info.CommitDate = commit.Committer.When.Format("2006-01-02 15:04:05 -0700")
+		info.GitCommitDate = commit.Committer.When.Format("2006-01-02 15:04:05 -0700")
 	}
 
-	if info.CommitTag == "" {
+	if info.GitTag == "" {
 		tags, err := repo.Tags()
 		if err != nil {
 			return err
@@ -88,7 +86,7 @@ func fetchGitInfoNative(info *BuildInfo) error {
 
 		err = tags.ForEach(func(t *plumbing.Reference) error {
 			if t.Hash() == ref.Hash() {
-				info.CommitTag = t.Name().Short()
+				info.GitTag = t.Name().Short()
 			}
 
 			return nil
@@ -98,50 +96,56 @@ func fetchGitInfoNative(info *BuildInfo) error {
 		}
 	}
 
-	return nil
-}
+	if info.GitLastTag == "" {
+		lastTag, err := getLastTagFromRepository(repo)
 
-func fetchGitInfo(info *BuildInfo, cmd bool) error {
-	if cmd {
-		return fetchGitInfoWithCmd(info)
-	}
-
-	return fetchGitInfoNative(info)
-}
-
-func fetchGitInfoWithCmd(info *BuildInfo) error {
-	type gitInfoFetch struct {
-		info    *string
-		command []string
-	}
-
-	var gitCommands = []gitInfoFetch{
-		{&info.CommitTag, []string{"git", "tag", "--points-at", "HEAD"}},
-		{&info.CommitHash, []string{"git", "rev-parse", "HEAD"}},
-		{&info.CommitBranch, []string{"git", "branch", "--show-current"}},
-		{&info.CommitDate, []string{"git", "show", "--quiet", "--format=%ci"}},
-	}
-
-	for i := range gitCommands {
-		gifc := &gitCommands[i]
-		if *gifc.info != "" {
-			continue
-		}
-
-		log.Debug("Fetching git info", "command", gifc.command)
-		cmd := exec.Command(gifc.command[0], gifc.command[1:]...) //nolint:gosec
-
-		var outBin []byte
-		var err error
-
-		if outBin, err = cmd.CombinedOutput(); err != nil {
+		if err != nil {
 			return err
 		}
 
-		out := strings.TrimRight(string(outBin), "\n")
-		log.Debug("Fetched git info", "command", gifc.command, "output", out)
-		*gifc.info = out
+		info.GitLastTag = lastTag
 	}
 
 	return nil
+}
+
+// See: https://github.com/src-d/go-git/issues/1030
+func getLastTagFromRepository(repository *git.Repository) (string, error) {
+	tagRefs, err := repository.Tags()
+	if err != nil {
+		return "", err
+	}
+
+	var latestTagCommit *object.Commit
+	var latestTagName string
+	err = tagRefs.ForEach(func(tagRef *plumbing.Reference) error {
+		revision := plumbing.Revision(tagRef.Name().String())
+		tagCommitHash, subErr := repository.ResolveRevision(revision)
+		if subErr != nil {
+			return subErr
+		}
+
+		commit, subErr := repository.CommitObject(*tagCommitHash)
+		if subErr != nil {
+			return subErr
+		}
+
+		if latestTagCommit == nil {
+			latestTagCommit = commit
+			latestTagName = tagRef.Name().Short()
+		}
+
+		if commit.Committer.When.After(latestTagCommit.Committer.When) {
+			latestTagCommit = commit
+			latestTagName = tagRef.Name().Short()
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return latestTagName, nil
 }

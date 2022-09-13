@@ -77,3 +77,14 @@ func TestRunStandardOne(t *testing.T) {
 
 	a.NoError(runMain([]string{}))
 }
+
+func TestVersionFromLastTag(t *testing.T) {
+	a := assert.New(t)
+
+	config, err := getEmptyConfig()
+	a.NoError(err)
+	bi, err := generateBuildInfo(config)
+	a.NoError(err)
+	a.NotEmpty(bi.GitLastTag)
+	a.NotEmpty(bi.Version)
+}

@@ -121,7 +121,12 @@ func loadConfig(fileName string) (*Config, error) {
 }
 
 func getEmptyConfig() (*Config, error) {
-	c := &Config{}
+	c := &Config{
+		InputVersionTag: ConfigVersionInputTag{
+			Pattern: `v?([0-9.]+)`,
+		},
+	}
+
 	var err error
 	c.Directory, err = os.Getwd()
 
@@ -130,10 +135,6 @@ func getEmptyConfig() (*Config, error) {
 
 func createDefaultConfig() *Config {
 	return &Config{
-		InputVersionFile: ConfigVersionInputFile{
-			File:    "README.md",
-			Pattern: "Version: ([0-9.]+)\n",
-		},
 		InputVersionTag: ConfigVersionInputTag{
 			Pattern: "^v?([0-9.]+)$",
 		},

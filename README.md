@@ -42,6 +42,12 @@ The most popular continuous integration services are supported.
 - [Travis CI](https://travis-ci.org/)
 - [Jenkins](https://jenkins.io/)
 
+## Supported package managers
+To extract version information:
+
+- [NPM](https://www.npmjs.com/)
+- [Maven](https://maven.apache.org/)
+
 ## Sample config file
 The `.ci-info.json` looks like this:
 ```json
@@ -72,15 +78,15 @@ The `.ci-info.json` looks like this:
 | Argument | Sample value | Description |
 | -------- | ------------ | ----------- |
 | `{{ .Version }}` | `0.1.0-fix-pr-check-f96a756` | The automatically generated version. This is mix of the declared one and the current GIT info. |
-| `{{ .CommitHash }}` | `f96a75638b0e1767f969e23f383f4bc75c0e6ba0` | The current GIT commit |
-| `{{ .CommitHashShort }}` | `f96a756` | Short version of a hash |
-| `{{ .CommitDate }}` | `2022-04-23 23:52:13 +0200` | The commit's date |
-| `{{ .CommitDateClean }}` | `2022-04-23-2157` | The commit's date in a clean format |
-| `{{ .CommitBranch }}` | `fix/pr-check` | The current branch |
-| `{{ .CommitBranchClean }}` | `fix-pr-check` | The commit branch without special chars |
-| `{{ .CommitTag }}` | `v0.1.0` | The current GIT tag |
-| `{{ .CommitRef }}` | `v0.1.0` | The current GIT tag or branch |
-| `{{ .CommitSmart }}` | `fix-pr-check-f96a756` | The current GIT commit described by tag, otherwise branch + hash, otherwise hash |
+| `{{ .GitCommitHash }}` | `f96a75638b0e1767f969e23f383f4bc75c0e6ba0` | The current GIT commit |
+| `{{ .GitCommitHashShort }}` | `f96a756` | Short version of a hash |
+| `{{ .GitCommitDate }}` | `2022-04-23 23:52:13 +0200` | The commit's date |
+| `{{ .GitCommitDateClean }}` | `2022-04-23-2157` | The commit's date in a clean format |
+| `{{ .GitBranch }}` | `fix/pr-check` | The current branch |
+| `{{ .GitBranchClean }}` | `fix-pr-check` | The commit branch without special chars |
+| `{{ .GitTag }}` | `v0.1.0` | The current GIT tag |
+| `{{ .GitRef }}` | `v0.1.0` | The current GIT tag or branch |
+| `{{ .GitSmartRef }}` | `fix-pr-check-f96a756` | The current GIT commit described by tag, otherwise branch + hash, otherwise hash |
 | `{{ .BuildDate }}` | `2022-04-23-2210` | The build time |
 | `{{ .BuildHost }}` | `build-server` | The build host |
 | `{{ .BuildUser }}` | `runner` | The build user |
