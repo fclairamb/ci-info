@@ -270,7 +270,7 @@ func (f gradleInfoFetcher) Fetch(bi *BuildInfo) error {
 	matches := re.FindStringSubmatch(string(b))
 
 	if len(matches) != 2 {
-		return fmt.Errorf("unable to find version in build.gradle: %w", errCouldNotFindVersion)
+		return errCouldNotFindVersion
 	}
 
 	bi.VersionDeclared = matches[1]
