@@ -29,6 +29,12 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v4
         with:
           images: fclairamb/ci-info
+          tags: |
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+            type=semver,pattern=alpine
+            type=ref,event=pr
       - name: Docker meta (alpine)
         id: docker_meta_alpine
         uses: crazy-max/ghaction-docker-meta@v4
@@ -36,6 +42,12 @@ jobs:
           images: fclairamb/ci-info
           flavor: |
             suffix=-alpine
+          tags: |
+              type=semver,pattern=v{{version}}
+              type=semver,pattern=v{{major}}.{{minor}}
+              type=semver,pattern=v{{major}}
+              type=semver,pattern=alpine
+              type=ref,event=pr
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
