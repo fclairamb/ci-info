@@ -39,6 +39,7 @@ jobs:
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}
             type=semver,pattern=alpine
+            type=ref,event=branch
             type=ref,event=pr
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
