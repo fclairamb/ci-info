@@ -36,6 +36,7 @@ jobs:
             ghcr.io/fclairamb/ci-info
           flavor: |
             suffix=${{ matrix.type != '' && format('-{0}', matrix.type) || '' }}
+            latest=false
           tags: |
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
