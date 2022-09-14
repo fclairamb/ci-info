@@ -34,6 +34,7 @@ jobs:
           images: fclairamb/ci-info
           flavor: |
             suffix=${{ matrix.type }}
+            suffixLatest=${{ matrix.type }}
           tags: |
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
@@ -69,7 +70,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./Dockerfile${{ matrix.type == '' && '' || format('.{0}', matrix.type) }}
+          file: ./Dockerfile${{ matrix.type != '' && format('.{0}', matrix.type) || '' }}
           platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
           push: ${{ github.repository == 'fclairamb/ci-info' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
