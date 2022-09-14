@@ -2,14 +2,17 @@ name: Build docker images
 
 on:
   push:
-    # branches: # At least when doing some tests
-    #  - "**"
+    #branches: # At least when doing some tests
+    # - "**"
     tags:
       - "v*.*.*"
   # pull_request:
 
 jobs:
-  multi-registries:
+  build-and-push:
+    strategy:
+      matrix:
+        type: ["", "alpine"]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -24,18 +27,23 @@ jobs:
         run: |
           go build -v ./...
           ./ci-info
-      - name: Docker meta (scratch)
+      - name: Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v4
+        uses: docker/metadata-action@v4
         with:
-          images: fclairamb/ci-info
-      - name: Docker meta (alpine)
-        id: docker_meta_alpine
-        uses: crazy-max/ghaction-docker-meta@v4
-        with:
-          images: fclairamb/ci-info
+          images: |
+            fclairamb/ci-info
+            ghcr.io/fclairamb/ci-info
           flavor: |
-            suffix=-alpine
+            suffix=${{ matrix.type != '' && format('-{0}', matrix.type) || '' }}
+            latest=false
+          tags: |
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+            type=semver,pattern=latest${{ matrix.type != '' && format('-{0}', matrix.type) || '' }}
+            type=ref,event=branch
+            type=ref,event=pr
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -44,7 +52,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-${{ matrix.type }}-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
       - name: Login to DockerHub
@@ -64,21 +72,16 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile${{ matrix.type != '' && format('.{0}', matrix.type) || '' }}
           platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
           push: ${{ github.repository == 'fclairamb/ci-info' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-      - name: Build and push (alpine)
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./Dockerfile.alpine
-          platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
-          push: ${{ github.repository == 'fclairamb/ci-info' }}
-          tags: ${{ steps.docker_meta_alpine.outputs.tags }}
-          labels: ${{ steps.docker_meta_alpine.outputs.labels }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+
+  build-and-push-status:
+      needs: build-and-push
+      runs-on: ubuntu-20.04
+      steps:
+        - run: echo 'All good'
