@@ -2,8 +2,8 @@ name: Build docker images
 
 on:
   push:
-    branches: # At least when doing some tests
-     - "**"
+    #branches: # At least when doing some tests
+    # - "**"
     tags:
       - "v*.*.*"
   # pull_request:
@@ -40,7 +40,7 @@ jobs:
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}
-            type=ref,event=tag,pattern=latest${{ matrix.type != '' && format('-{0}', matrix.type) || '' }}
+            type=semver,pattern=latest${{ matrix.type != '' && format('-{0}', matrix.type) || '' }}
             type=ref,event=branch
             type=ref,event=pr
       - name: Set up QEMU
