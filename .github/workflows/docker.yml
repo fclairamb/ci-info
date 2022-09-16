@@ -41,7 +41,7 @@ jobs:
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}
-            type=semver,suffix=,pattern=${{ matrix.type != '' && format('{0}', matrix.type) || 'latest' }}
+            type=semver,suffix=,pattern=${{ matrix.type != '' && matrix.type || 'latest' }}
             type=ref,event=branch
             type=ref,event=pr
       - name: Set up QEMU
