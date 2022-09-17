@@ -88,3 +88,25 @@ func TestVersionFromLastTag(t *testing.T) {
 	a.NotEmpty(bi.GitLastTag)
 	a.NotEmpty(bi.Version)
 }
+
+func TestShowVersion(t *testing.T) {
+	a := assert.New(t)
+
+	a.NoError(runMain([]string{"-v"}))
+}
+
+func TestShowHelp(t *testing.T) {
+	a := assert.New(t)
+
+	a.NoError(runMain([]string{"-h"}))
+	a.NoError(runMain([]string{"-help"}))
+	a.NoError(runMain([]string{"--help"}))
+	a.Error(runMain([]string{"-unknown-flag"}))
+}
+
+func TestInit(t *testing.T) {
+	a := assert.New(t)
+
+	a.NoError(runMain([]string{"-i", "-c", "testdata/.ci-info.init.out"}))
+	a.FileExists("testdata/.ci-info.init.out")
+}
