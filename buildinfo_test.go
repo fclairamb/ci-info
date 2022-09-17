@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -81,4 +82,16 @@ func TestReadme(t *testing.T) {
 	a.NotEmpty(bi.Version)
 
 	a.NoError(saveOutputFiles(config, bi))
+}
+
+func TestEnvVersion(t *testing.T) {
+	a := assert.New(t)
+
+	config := createDefaultConfig()
+
+	t.Setenv("VERSION", "1.2.3")
+
+	bi := &BuildInfo{}
+	a.NoError(bi.loadVersion(config))
+	a.Equal("1.2.3", bi.Version)
 }

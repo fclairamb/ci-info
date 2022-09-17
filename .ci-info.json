@@ -6,5 +6,8 @@
   "templates": [{
     "input_file": "build.go.tpl",
     "output_file": "build.go"
+  },{
+    "input_file": "README.md",
+    "output_file": "testdata/README.md.out"
   }]
 }

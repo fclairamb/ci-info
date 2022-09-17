@@ -95,6 +95,7 @@ func loadConfig(fileName string) (*Config, error) {
 	}
 
 	config := &Config{}
+	log.Info("config: " + string(jsonContent))
 	err = json.Unmarshal(jsonContent, config)
 
 	if !fetched && config.Directory == "" {
