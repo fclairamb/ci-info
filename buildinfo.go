@@ -6,8 +6,6 @@ import (
 	"os"
 	"regexp"
 	"time"
-
-	log "github.com/inconshreveable/log15"
 )
 
 // BuildInfo contains all the information about the build

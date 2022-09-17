@@ -7,8 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-
-	log "github.com/inconshreveable/log15"
 )
 
 // ConfigVersionInputFile defines how we shall fetch the input version

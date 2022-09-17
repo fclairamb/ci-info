@@ -7,6 +7,7 @@ type CmdParams struct {
 	ConfigFile          string
 	OutputBuildInfoFile string
 	OutputVersionFile   string
+	LoggingLevel        string
 	Version             bool
 	Init                bool
 }
@@ -19,6 +20,7 @@ func getParams(args []string) (*CmdParams, error) {
 	fs.BoolVar(&params.Version, "v", false, "version")
 	fs.StringVar(&params.OutputBuildInfoFile, "b", "", "build info file")
 	fs.StringVar(&params.OutputVersionFile, "vf", "", "version file")
+	fs.StringVar(&params.LoggingLevel, "l", "info", "logging level")
 	fs.BoolVar(&params.Init, "i", false, "init config file")
 
 	return params, fs.Parse(args)

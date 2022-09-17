@@ -10,8 +10,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	log "github.com/inconshreveable/log15"
 )
 
 const sTrue = "true"
