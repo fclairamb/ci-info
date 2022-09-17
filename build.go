@@ -2,11 +2,11 @@ package main
 
 var (
 	// BuildVersion is the current version of the program
-	BuildVersion = "0.4.3-feature-log-865e6a1"
+	BuildVersion = "0.4.3-feature-log-b8d7684"
 
 	// BuildDate is the time the program was built
-	BuildDate = "2022-09-17T23:18:15Z"
+	BuildDate = "2022-09-17T23:24:30Z"
 
 	// Commit is the git hash of the program
-	Commit = "feature-log-865e6a1"
+	Commit = "feature-log-b8d7684"
 )

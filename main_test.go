@@ -56,7 +56,7 @@ func TestRunOutputBuildInfoFile(t *testing.T) {
 	a.FileExists(outputFIle)
 }
 
-func TestRunMaven(t *testing.T) {
+func TestMainRunMaven(t *testing.T) {
 	a := assert.New(t)
 
 	a.NoError(runMain([]string{"-c", "testdata/maven/.ci-info.json"}))
@@ -64,7 +64,7 @@ func TestRunMaven(t *testing.T) {
 	a.FileExists("testdata/maven/version.txt")
 }
 
-func TestRunNpm(t *testing.T) {
+func TestMainRunNpm(t *testing.T) {
 	a := assert.New(t)
 
 	a.NoError(runMain([]string{"-c", "testdata/npm/.ci-info.json"}))
@@ -89,13 +89,13 @@ func TestVersionFromLastTag(t *testing.T) {
 	a.NotEmpty(bi.Version)
 }
 
-func TestShowVersion(t *testing.T) {
+func TestMainVersion(t *testing.T) {
 	a := assert.New(t)
 
 	a.NoError(runMain([]string{"-v"}))
 }
 
-func TestShowHelp(t *testing.T) {
+func TestMainHelp(t *testing.T) {
 	a := assert.New(t)
 
 	a.NoError(runMain([]string{"-h"}))
@@ -104,9 +104,19 @@ func TestShowHelp(t *testing.T) {
 	a.Error(runMain([]string{"-unknown-flag"}))
 }
 
-func TestInit(t *testing.T) {
+func TestMainInit(t *testing.T) {
 	a := assert.New(t)
 
 	a.NoError(runMain([]string{"-i", "-c", "testdata/.ci-info.init.out"}))
 	a.FileExists("testdata/.ci-info.init.out")
+}
+
+func TestMainLoggingLevel(t *testing.T) {
+	a := assert.New(t)
+
+	a.NoError(runMain([]string{"-l", "debug"}))
+	a.NoError(runMain([]string{"-l", "info"}))
+	a.NoError(runMain([]string{"-l", "warn"}))
+	a.NoError(runMain([]string{"-l", "error"}))
+	a.Error(runMain([]string{"-l", "bad"}))
 }

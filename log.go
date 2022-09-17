@@ -7,7 +7,7 @@ import (
 // Log is the logger
 var log log15.Logger
 
-func initLog() {
+func init() { //nolint:gochecknoinits
 	log = log15.New()
 }
 

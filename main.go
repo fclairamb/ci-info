@@ -147,8 +147,6 @@ func processParams(params *CmdParams) (*Config, error) {
 }
 
 func runMain(args []string) error {
-	initLog()
-
 	params, err := getParams(args)
 
 	if err != nil {
