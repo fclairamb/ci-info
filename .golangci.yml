@@ -164,7 +164,7 @@ linters:
     disable-all: true
     enable:
         - bodyclose
-        - deadcode
+        # - deadcode --> unused
         - depguard
         - dogsled
         - dupl
@@ -206,13 +206,13 @@ linters:
         # - scopelint --> exportloopref
         - exportloopref 
         - staticcheck
-        - structcheck
+        # - structcheck --> unused
         - stylecheck
         - typecheck
         - unconvert
         - unparam
         - unused
-        - varcheck
+        # - varcheck --> unused
         - whitespace
         # - wrapcheck
         - wsl

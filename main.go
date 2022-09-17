@@ -1,3 +1,4 @@
+// Package main is the sole package of this program (so far)
 package main
 
 import (
@@ -11,8 +12,6 @@ import (
 
 	log "github.com/inconshreveable/log15"
 )
-
-var errNoGITInfoFound = fmt.Errorf("no info found (are you in a git repo ?)")
 
 func generateBuildInfo(config *Config) (*BuildInfo, error) {
 	var err error
