@@ -89,7 +89,7 @@ func (bi *BuildInfo) save(fileName string) error {
 		return fmt.Errorf("could not marshal build info: %w", err)
 	}
 
-	return os.WriteFile(fileName, content, 0600)
+	return os.WriteFile(fileName, content, 0644) //nolint:gosec
 }
 
 func (bi *BuildInfo) loadVersion(config *Config) error { //nolint:gocyclo
