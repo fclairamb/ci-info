@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path"
+	"time"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -75,7 +76,7 @@ func fetchGitInfo(info *BuildInfo) error { //nolint:gocyclo
 			return err
 		}
 
-		info.GitCommitDate = commit.Committer.When.Format("2006-01-02 15:04:05 -0700")
+		info.GitCommitDate = commit.Committer.When.Format(time.RFC3339)
 	}
 
 	if info.GitTag == "" {
