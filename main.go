@@ -198,7 +198,7 @@ func applyTemplate(templateString string, outputFile string, buildInfo *BuildInf
 
 	log.Debug("Saving formatted file", "path", outputFile)
 
-	if err := os.WriteFile(outputFile, buffer.Bytes(), 0600); err != nil {
+	if err := os.WriteFile(outputFile, buffer.Bytes(), 0644); err != nil { //nolint:gosec
 		return fmt.Errorf("could not write output file: %w", err)
 	}
 
