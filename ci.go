@@ -13,7 +13,6 @@ import (
 )
 
 const sTrue = "true"
-const refBranch = "refs/heads/"
 const refTags = "refs/tags/"
 
 var errCouldNotFindVersion = errors.New("could not find version")
@@ -98,18 +97,17 @@ type githubActionsCIInfoFetcher struct{}
 
 // Detect if it's a suited fetcher
 func (f githubActionsCIInfoFetcher) Detect(_ string) bool {
-	return os.Getenv("GITHUB_ACTION") != ""
+	return os.Getenv("GITHUB_ACTION") == sTrue
 }
 
 // Fetch fetches the CI information
 func (f githubActionsCIInfoFetcher) Fetch(_ string, bi *BuildInfo) error {
 	bi.GitCommitHash = os.Getenv("GITHUB_SHA")
 	bi.CIBuildNumber = os.Getenv("GITHUB_RUN_ID")
-	ref := os.Getenv("GITHUB_REF")
+	bi.GitBranch = os.Getenv("GITHUB_HEAD_REF")
 
-	if strings.HasPrefix(ref, refBranch) {
-		bi.GitBranch = ref[len(refBranch):]
-	} else if strings.HasPrefix(ref, refTags) {
+	ref := os.Getenv("GITHUB_REF")
+	if strings.HasPrefix(ref, refTags) {
 		bi.GitTag = ref[len(refTags):]
 	}
 
