@@ -10,10 +10,10 @@ import (
 func TestDate(t *testing.T) {
 	a := require.New(t)
 	bi := &BuildInfo{
-		GitCommitDate: "2022-04-21 11:52:09 +0200",
+		GitCommitDate: "2022-04-21T11:52:09Z",
 	}
 	a.Nil(bi.complete())
-	a.Equal("2022-04-21-0952", bi.GitCommitDateClean)
+	a.Equal("2022-04-21-1152", bi.GitCommitDateClean)
 }
 
 func TestTagOrBranch(t *testing.T) {
@@ -56,7 +56,7 @@ func TestSave(t *testing.T) {
 	bi := &BuildInfo{
 		VersionDeclared: "1.2.3",
 		GitCommitHash:   "a6850c90c8d3c81377cee5701f79dfbbd6e5a756",
-		GitCommitDate:   "2022-04-21 11:52:09 +0200",
+		GitCommitDate:   "2022-09-18T01:27:36+02:00",
 		GitBranch:       "main",
 	}
 	a.Nil(bi.complete())

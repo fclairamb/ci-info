@@ -41,7 +41,7 @@ func (bi *BuildInfo) complete() error {
 	}
 
 	if bi.GitCommitDate != "" {
-		date, err := time.Parse("2006-01-02 15:04:05 -0700", bi.GitCommitDate)
+		date, err := time.Parse(time.RFC3339, bi.GitCommitDate)
 		if err != nil {
 			return fmt.Errorf("could not parse commit date: %w", err)
 		}
@@ -77,7 +77,7 @@ func (bi *BuildInfo) complete() error {
 	}
 
 	if bi.BuildDate == "" {
-		bi.BuildDate = time.Now().UTC().Format(time.RFC3339)
+		bi.BuildDate = time.Now().Format(time.RFC3339)
 	}
 
 	return nil
