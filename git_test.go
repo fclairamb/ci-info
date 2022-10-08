@@ -48,7 +48,7 @@ func testGitInfo(a *require.Assertions, bi *BuildInfo) {
 	}
 
 	a.NotEmpty(bi.GitCommitDate)
-	a.Regexp("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\+[0-9]{2}:[0-9]{2}", bi.GitCommitDate)
+	a.Regexp("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|\\+[0-9]{2}:[0-9]{2})", bi.GitCommitDate)
 
 	a.Nil(bi.complete())
 
