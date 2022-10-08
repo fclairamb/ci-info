@@ -1,6 +1,8 @@
 name: autoupdate
 on:
   push:
+    branches:
+      - main
 jobs:
   autoupdate:
     name: autoupdate
@@ -12,5 +14,5 @@ jobs:
           PR_FILTER: "labelled"
           PR_LABELS: "autoupdate"
           EXCLUDED_LABELS: "dependencies"
-          MERGE_MSG: "Branch was auto-updated."
+          MERGE_MSG: "Auto-updating branch."
           MERGE_CONFLICT_ACTION: "fail"
