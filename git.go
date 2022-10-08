@@ -8,6 +8,7 @@ import (
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing/storer"
 )
 
 // var repo *git.Repository
@@ -88,6 +89,8 @@ func fetchGitInfo(info *BuildInfo) error { //nolint:gocyclo
 		err = tags.ForEach(func(t *plumbing.Reference) error {
 			if t.Hash() == ref.Hash() {
 				info.GitTag = t.Name().Short()
+
+				return storer.ErrStop
 			}
 
 			return nil
