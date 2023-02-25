@@ -2,7 +2,7 @@
 # docker run -ti -v $(pwd):/work fclairamb/ci-info
 
 # Preparing the build environment
-FROM golang:1.20.0-alpine3.16 AS builder
+FROM golang:1.20.1-alpine3.16 AS builder
 # RUN apk add --update --no-cache bash ca-certificates curl git
 RUN mkdir -p /build
 WORKDIR /build
