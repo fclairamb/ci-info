@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3.0.0 # Checkout our working repository
       - name: Generate changelog
         id: changelog
-        uses: TriPSs/conventional-changelog-action@v3.0.0
+        uses: TriPSs/conventional-changelog-action@v3.18.0
         with:
           github-token: ${{ secrets.github_token }}
           create-summary: true
