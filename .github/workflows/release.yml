@@ -9,15 +9,15 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3 # Checkout our working repository
+        uses: actions/checkout@v3.0.0 # Checkout our working repository
       - name: Generate changelog
         id: changelog
-        uses: TriPSs/conventional-changelog-action@v3
+        uses: TriPSs/conventional-changelog-action@v3.0.0
         with:
           github-token: ${{ secrets.github_token }}
           create-summary: true
       - name: Create Release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.0.0
         if: ${{ steps.changelog.outputs.skipped == 'false' }}
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
