@@ -17,7 +17,7 @@ jobs:
           github-token: ${{ secrets.github_token }}
           create-summary: true
       - name: Create Release
-        uses: actions/create-release@v1.0.0
+        uses: actions/create-release@v1.1.4
         if: ${{ steps.changelog.outputs.skipped == 'false' }}
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
