@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.5.2 # Checkout our working repository
+        uses: actions/checkout@v3.5.3 # Checkout our working repository
       - name: Generate changelog
         id: changelog
         uses: TriPSs/conventional-changelog-action@v3.18.1
