@@ -3,7 +3,7 @@ module github.com/fclairamb/ci-info
 go 1.19
 
 require (
-	github.com/go-git/go-git/v5 v5.7.0
+	github.com/go-git/go-git/v5 v5.8.0
 	github.com/inconshreveable/log15 v0.0.0-20221122034931-555555054819
 )
 
