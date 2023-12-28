@@ -13,7 +13,7 @@ RUN go build -mod=readonly -v -o ci-info
 
 # Preparing the final image
 # FROM alpine:3.16.2
-FROM alpine:3.18.5
+FROM alpine:3.19.0
 WORKDIR /work
 RUN apk add --update --no-cache bash ca-certificates curl git
 COPY --from=builder /build/ci-info /bin/ci-info
