@@ -13,6 +13,10 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 
+    permissions:
+      contents: read
+      id-token: write # Codecov upload
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
@@ -34,13 +38,14 @@ jobs:
           go-version: ${{ matrix.go }}
 
       - name: Test
-        # We need GCC because of the "go test -race"
-        # env:
-        #   CGO_ENABLED: 0
-        run: |
-          apt-get update && apt-get install gcc -y
-          go test -race -v ./... -coverprofile=coverage.txt -covermode=atomic
-          bash <(curl -s https://codecov.io/bash)
+        run: go test -race -v ./... -coverprofile=coverage.txt -covermode=atomic
+
+      # No upload token to keep: the job proves who it is to Codecov with its OIDC identity
+      - name: Codecov
+        uses: codecov/codecov-action@v7.1.1
+        with:
+          use_oidc: true
+          fail_ci_if_error: true
   # For github to have a unique status check name
   build-status:
     needs: build
