@@ -33,9 +33,9 @@ jobs:
 
       # Install Go
       - name: Setup go
-        uses: actions/setup-go@v4.3.0
+        uses: actions/setup-go@v7.0.0
         with:
-          go-version: ${{ matrix.go }}
+          go-version-file: go.mod
 
       - name: Test
         run: go test -race -v ./... -coverprofile=coverage.txt -covermode=atomic
