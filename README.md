@@ -105,16 +105,16 @@ The `.ci-info.json` looks like this:
 # Run it
 ## With a local binary
 ```sh
-curl -L https://github.com/fclairamb/ci-info/releases/download/v0.3.0/ci-info_0.3.0_darwin_arm64.tar.gz | tar -x && ./ci-info
+curl -L https://github.com/fclairamb/ci-info/releases/download/v0.5.0/ci-info_0.5.0_darwin_arm64.tar.gz | tar -x && ./ci-info
 ```
 
 ## with a container
 From scratch (single binary):
 ```sh
-docker run --rm -ti -v $(pwd):/work fclairamb/ci-info:v0.3.0
+docker run --rm -ti -v $(pwd):/work fclairamb/ci-info:0.5.0
 ```
 
 With alpine:
 ```sh
-docker run --rm -ti -v $(pwd):/work fclairamb/ci-info:v0.3.0-alpine
+docker run --rm -ti -v $(pwd):/work fclairamb/ci-info:0.5.0-alpine
 ```
